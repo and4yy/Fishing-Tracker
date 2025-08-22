@@ -8,6 +8,7 @@ import Dashboard from "./pages/Dashboard";
 import NewTrip from "./pages/NewTrip";
 import TripHistory from "./pages/TripHistory";
 import EditTrip from "./pages/EditTrip";
+import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,6 +25,7 @@ const App = () => (
             <Route path="/new-trip" element={<NewTrip />} />
             <Route path="/history" element={<TripHistory />} />
             <Route path="/edit-trip/:id" element={<EditTrip />} />
+            <Route path="/settings" element={<Settings />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

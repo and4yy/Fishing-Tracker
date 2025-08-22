@@ -4,7 +4,7 @@ import { SummaryCards } from "@/components/dashboard/summary-cards";
 import { StorageService } from "@/lib/storage";
 import { exportToExcel } from "@/lib/export";
 import { TripSummary } from "@/types/fishing";
-import { Download, Anchor } from "lucide-react";
+import { Download, Anchor, Settings } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 export default function Dashboard() {
@@ -62,14 +62,26 @@ export default function Dashboard() {
     <div className="container mx-auto p-4 pb-20 space-y-6">
       {/* Header */}
       <div className="text-center space-y-2">
-        <div className="flex items-center justify-center gap-3 mb-4">
-          <div className="p-3 ocean-gradient rounded-xl">
-            <Anchor className="h-8 w-8 text-white" />
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3 flex-1 justify-center">
+            <div className="p-3 ocean-gradient rounded-xl">
+              <Anchor className="h-8 w-8 text-white" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold">Fishing Tracker</h1>
+              <p className="text-muted-foreground">Track your fishing adventures</p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-3xl font-bold">Fishing Tracker</h1>
-            <p className="text-muted-foreground">Track your fishing adventures</p>
-          </div>
+          <Button 
+            variant="outline" 
+            size="icon"
+            asChild
+            className="shrink-0"
+          >
+            <a href="/settings">
+              <Settings className="h-4 w-4" />
+            </a>
+          </Button>
         </div>
       </div>
 

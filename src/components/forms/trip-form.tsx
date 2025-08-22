@@ -8,7 +8,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { FishingTrip, Expense, FishSale } from "@/types/fishing";
 import { calculateProfit, calculateProfitDistribution, generateTripId, generateFishSaleId } from "@/lib/calculations";
-import { Plus, Minus, Save } from "lucide-react";
+import { generateInvoiceNumber, downloadInvoiceAsPDF, printInvoice } from "@/lib/invoice";
+import { BoatSettingsService } from "@/components/settings/boat-settings";
+import { Plus, Minus, Save, FileText, Printer } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface TripFormProps {
@@ -113,6 +115,52 @@ export function TripForm({ onSubmit, onSaveBasic, initialData, isEditing = false
         totalCatch: prev.totalCatch - saleToRemove.weight,
         totalSales: prev.totalSales - saleToRemove.totalAmount
       }));
+    }
+  };
+
+  const generateInvoice = (fishSale: FishSale, action: 'download' | 'print') => {
+    try {
+      const boatSettings = BoatSettingsService.getSettings();
+      
+      if (!boatSettings.boatName || !boatSettings.ownerName) {
+        toast({
+          title: "Boat details required",
+          description: "Please configure your boat details in Settings before generating invoices.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      const invoiceData = {
+        invoiceNumber: generateInvoiceNumber(),
+        date: formData.date,
+        customer: {
+          name: fishSale.name,
+          contact: fishSale.contact
+        },
+        boat: boatSettings,
+        fishSale
+      };
+
+      if (action === 'download') {
+        downloadInvoiceAsPDF(invoiceData);
+        toast({
+          title: "Invoice generated",
+          description: `Invoice for ${fishSale.name} has been downloaded.`
+        });
+      } else {
+        printInvoice(invoiceData);
+        toast({
+          title: "Invoice printed",
+          description: `Invoice for ${fishSale.name} is being printed.`
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error generating invoice",
+        description: "There was a problem generating the invoice.",
+        variant: "destructive"
+      });
     }
   };
 
@@ -375,27 +423,51 @@ export function TripForm({ onSubmit, onSaveBasic, initialData, isEditing = false
               <div className="text-sm font-medium">Fish Sales:</div>
               <div className="space-y-2 max-h-60 overflow-y-auto">
                 {formData.fishSales.map((sale) => (
-                  <div key={sale.id} className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                    <div className="flex-1 grid grid-cols-1 md:grid-cols-4 gap-2 text-sm">
-                      <div><strong>{sale.name}</strong></div>
-                      <div>{sale.contact}</div>
-                      <div>{sale.weight}kg × MVR {sale.ratePrice}</div>
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium">MVR {sale.totalAmount.toFixed(2)}</span>
-                        <span className={`px-2 py-1 rounded text-xs ${sale.paid ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
-                          {sale.paid ? 'Paid' : 'Unpaid'}
-                        </span>
+                  <div key={sale.id} className="p-3 bg-muted rounded-lg space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1 grid grid-cols-1 md:grid-cols-4 gap-2 text-sm">
+                        <div><strong>{sale.name}</strong></div>
+                        <div>{sale.contact}</div>
+                        <div>{sale.weight}kg × MVR {sale.ratePrice}</div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium">MVR {sale.totalAmount.toFixed(2)}</span>
+                          <span className={`px-2 py-1 rounded text-xs ${sale.paid ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                            {sale.paid ? 'Paid' : 'Unpaid'}
+                          </span>
+                        </div>
                       </div>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        onClick={() => removeFishSale(sale.id)}
+                        className="ml-2"
+                      >
+                        <Minus className="h-4 w-4" />
+                      </Button>
                     </div>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="icon"
-                      onClick={() => removeFishSale(sale.id)}
-                      className="ml-2"
-                    >
-                      <Minus className="h-4 w-4" />
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => generateInvoice(sale, 'download')}
+                        className="flex-1"
+                      >
+                        <FileText className="h-4 w-4 mr-1" />
+                        Download Invoice
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => generateInvoice(sale, 'print')}
+                        className="flex-1"
+                      >
+                        <Printer className="h-4 w-4 mr-1" />
+                        Print Invoice
+                      </Button>
+                    </div>
                   </div>
                 ))}
               </div>
