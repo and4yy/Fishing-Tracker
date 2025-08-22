@@ -27,6 +27,38 @@ export default function NewTrip() {
     }
   };
 
+  const handleSaveBasic = (partialTrip: Partial<FishingTrip>) => {
+    try {
+      // For basic save, we create a minimal trip object with default values
+      const basicTrip: FishingTrip = {
+        id: partialTrip.id || '',
+        date: partialTrip.date || '',
+        crew: partialTrip.crew || [],
+        expenses: partialTrip.expenses || { fuel: 0, food: 0, other: 0 },
+        fishSales: partialTrip.fishSales || [],
+        tripType: partialTrip.tripType || 'Day',
+        totalCatch: 0,
+        totalSales: 0,
+        profit: 0,
+        ownerSharePercent: 0,
+        profitPerCrew: 0,
+        ownerProfit: 0,
+      };
+      
+      StorageService.saveTrip(basicTrip);
+      toast({
+        title: "Basic trip details saved",
+        description: "You can continue adding fish sales and complete the trip later."
+      });
+    } catch (error) {
+      toast({
+        title: "Error saving basic trip details",
+        description: "There was a problem saving your trip. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+
   return (
     <div className="container mx-auto p-4 pb-20 space-y-6">
       <div className="flex items-center gap-4">
@@ -39,7 +71,7 @@ export default function NewTrip() {
         </div>
       </div>
 
-      <TripForm onSubmit={handleSubmit} />
+      <TripForm onSubmit={handleSubmit} onSaveBasic={handleSaveBasic} />
     </div>
   );
 }

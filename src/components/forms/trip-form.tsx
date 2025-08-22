@@ -5,19 +5,23 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { FishingTrip, Expense } from "@/types/fishing";
-import { calculateProfit, calculateProfitDistribution, generateTripId } from "@/lib/calculations";
-import { Plus, Minus } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { FishingTrip, Expense, FishSale } from "@/types/fishing";
+import { calculateProfit, calculateProfitDistribution, generateTripId, generateFishSaleId } from "@/lib/calculations";
+import { Plus, Minus, Save } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface TripFormProps {
   onSubmit: (trip: FishingTrip) => void;
+  onSaveBasic?: (trip: Partial<FishingTrip>) => void;
   initialData?: Partial<FishingTrip>;
   isEditing?: boolean;
 }
 
 const tripTypes: Array<FishingTrip['tripType']> = ['Day', 'Night', 'Deep sea', 'Reef', 'Coastal', 'Other'];
 
-export function TripForm({ onSubmit, initialData, isEditing = false }: TripFormProps) {
+export function TripForm({ onSubmit, onSaveBasic, initialData, isEditing = false }: TripFormProps) {
+  const { toast } = useToast();
   const [formData, setFormData] = useState({
     date: initialData?.date || new Date().toISOString().split('T')[0],
     crew: initialData?.crew || [''],
@@ -26,6 +30,15 @@ export function TripForm({ onSubmit, initialData, isEditing = false }: TripFormP
     totalCatch: initialData?.totalCatch || 0,
     totalSales: initialData?.totalSales || 0,
     ownerSharePercent: initialData?.ownerSharePercent || 0,
+    fishSales: initialData?.fishSales || [] as FishSale[],
+  });
+
+  const [newFishSale, setNewFishSale] = useState({
+    name: '',
+    contact: '',
+    weight: 0,
+    ratePrice: 0,
+    paid: false
   });
 
   const addCrewMember = () => {
@@ -49,6 +62,79 @@ export function TripForm({ onSubmit, initialData, isEditing = false }: TripFormP
     }));
   };
 
+  const addFishSale = () => {
+    if (!newFishSale.name.trim() || newFishSale.weight <= 0 || newFishSale.ratePrice <= 0) {
+      toast({
+        title: "Invalid fish sale",
+        description: "Please fill in all required fields with valid values.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const totalAmount = newFishSale.weight * newFishSale.ratePrice;
+    const fishSale: FishSale = {
+      id: generateFishSaleId(),
+      name: newFishSale.name.trim(),
+      contact: newFishSale.contact.trim(),
+      weight: newFishSale.weight,
+      ratePrice: newFishSale.ratePrice,
+      totalAmount,
+      paid: newFishSale.paid
+    };
+
+    setFormData(prev => ({
+      ...prev,
+      fishSales: [...prev.fishSales, fishSale],
+      totalCatch: prev.totalCatch + newFishSale.weight,
+      totalSales: prev.totalSales + totalAmount
+    }));
+
+    setNewFishSale({
+      name: '',
+      contact: '',
+      weight: 0,
+      ratePrice: 0,
+      paid: false
+    });
+
+    toast({
+      title: "Fish sale added",
+      description: `Added sale for ${newFishSale.name}: ${newFishSale.weight}kg at MVR ${newFishSale.ratePrice}/kg`
+    });
+  };
+
+  const removeFishSale = (id: string) => {
+    const saleToRemove = formData.fishSales.find(sale => sale.id === id);
+    if (saleToRemove) {
+      setFormData(prev => ({
+        ...prev,
+        fishSales: prev.fishSales.filter(sale => sale.id !== id),
+        totalCatch: prev.totalCatch - saleToRemove.weight,
+        totalSales: prev.totalSales - saleToRemove.totalAmount
+      }));
+    }
+  };
+
+  const handleSaveBasic = () => {
+    if (!onSaveBasic) return;
+    
+    const basicTrip = {
+      id: initialData?.id || generateTripId(),
+      date: formData.date,
+      crew: formData.crew.filter(member => member.trim() !== ''),
+      expenses: formData.expenses,
+      tripType: formData.tripType,
+      fishSales: formData.fishSales
+    };
+    
+    onSaveBasic(basicTrip);
+    toast({
+      title: "Basic trip details saved",
+      description: "You can continue adding fish sales."
+    });
+  };
+
   const updateExpense = (type: keyof Expense, value: number) => {
     setFormData(prev => ({
       ...prev,
@@ -68,6 +154,7 @@ export function TripForm({ onSubmit, initialData, isEditing = false }: TripFormP
       date: formData.date,
       crew: crewMembers,
       expenses: formData.expenses,
+      fishSales: formData.fishSales,
       tripType: formData.tripType,
       totalCatch: formData.totalCatch,
       totalSales: formData.totalSales,
@@ -198,6 +285,125 @@ export function TripForm({ onSubmit, initialData, isEditing = false }: TripFormP
           <div className="text-sm text-muted-foreground">
             Total Expenses: MVR {(formData.expenses.fuel + formData.expenses.food + formData.expenses.other).toFixed(2)}
           </div>
+          {onSaveBasic && (
+            <Button 
+              type="button" 
+              onClick={handleSaveBasic}
+              className="w-full"
+              variant="outline"
+            >
+              <Save className="h-4 w-4 mr-2" />
+              Save Basic Trip Details
+            </Button>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Fish Sale Details</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+            <div>
+              <Label htmlFor="fishName">Customer Name</Label>
+              <Input
+                id="fishName"
+                placeholder="Customer name"
+                value={newFishSale.name}
+                onChange={(e) => setNewFishSale(prev => ({ ...prev, name: e.target.value }))}
+              />
+            </div>
+            <div>
+              <Label htmlFor="fishContact">Contact</Label>
+              <Input
+                id="fishContact"
+                placeholder="Phone/Contact"
+                value={newFishSale.contact}
+                onChange={(e) => setNewFishSale(prev => ({ ...prev, contact: e.target.value }))}
+              />
+            </div>
+            <div>
+              <Label htmlFor="fishWeight">Weight (kg)</Label>
+              <Input
+                id="fishWeight"
+                type="number"
+                step="0.1"
+                value={newFishSale.weight || ''}
+                onChange={(e) => setNewFishSale(prev => ({ ...prev, weight: parseFloat(e.target.value) || 0 }))}
+              />
+            </div>
+            <div>
+              <Label htmlFor="fishRate">Rate (MVR/kg)</Label>
+              <Input
+                id="fishRate"
+                type="number"
+                step="0.01"
+                value={newFishSale.ratePrice || ''}
+                onChange={(e) => setNewFishSale(prev => ({ ...prev, ratePrice: parseFloat(e.target.value) || 0 }))}
+              />
+            </div>
+            <div className="space-y-2">
+              <div className="flex items-center space-x-2">
+                <Switch 
+                  id="fishPaid"
+                  checked={newFishSale.paid}
+                  onCheckedChange={(checked) => setNewFishSale(prev => ({ ...prev, paid: checked }))}
+                />
+                <Label htmlFor="fishPaid" className="text-sm">Paid</Label>
+              </div>
+              <Button
+                type="button"
+                onClick={addFishSale}
+                className="w-full"
+                size="sm"
+              >
+                <Plus className="h-4 w-4 mr-1" />
+                Add Sale
+              </Button>
+            </div>
+          </div>
+          
+          {newFishSale.weight > 0 && newFishSale.ratePrice > 0 && (
+            <div className="text-sm text-muted-foreground">
+              Total Amount: MVR {(newFishSale.weight * newFishSale.ratePrice).toFixed(2)}
+            </div>
+          )}
+
+          {formData.fishSales.length > 0 && (
+            <div className="space-y-2">
+              <div className="text-sm font-medium">Fish Sales:</div>
+              <div className="space-y-2 max-h-60 overflow-y-auto">
+                {formData.fishSales.map((sale) => (
+                  <div key={sale.id} className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                    <div className="flex-1 grid grid-cols-1 md:grid-cols-4 gap-2 text-sm">
+                      <div><strong>{sale.name}</strong></div>
+                      <div>{sale.contact}</div>
+                      <div>{sale.weight}kg × MVR {sale.ratePrice}</div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium">MVR {sale.totalAmount.toFixed(2)}</span>
+                        <span className={`px-2 py-1 rounded text-xs ${sale.paid ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                          {sale.paid ? 'Paid' : 'Unpaid'}
+                        </span>
+                      </div>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      onClick={() => removeFishSale(sale.id)}
+                      className="ml-2"
+                    >
+                      <Minus className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+              <div className="text-sm font-medium text-right">
+                Total Fish Sales: MVR {formData.fishSales.reduce((sum, sale) => sum + sale.totalAmount, 0).toFixed(2)}
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 

@@ -27,3 +27,7 @@ export const calculateProfitDistribution = (
 export const generateTripId = (): string => {
   return `trip-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 };
+
+export const generateFishSaleId = (): string => {
+  return `sale-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+};

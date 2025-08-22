@@ -81,7 +81,7 @@ export default function EditTrip() {
         </div>
       </div>
 
-      <TripForm onSubmit={handleSubmit} initialData={trip} isEditing />
+      <TripForm onSubmit={handleSubmit} initialData={{...trip, fishSales: trip.fishSales || []}} isEditing />
     </div>
   );
 }
