@@ -1,0 +1,51 @@
+{
+  "name": "Fishing Tracker - Offshore Trip Management",
+  "short_name": "Fishing Tracker",
+  "description": "Mobile-friendly offline fishing trip tracker for managing crew, expenses, catch data and profit calculations",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0ea5e9",
+  "theme_color": "#0ea5e9",
+  "orientation": "portrait",
+  "scope": "/",
+  "lang": "en",
+  "categories": ["business", "productivity", "utilities"],
+  "icons": [
+    {
+      "src": "/lovable-uploads/8ffa4875-a4db-4020-8ad5-45a6e64406d7.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/lovable-uploads/8ffa4875-a4db-4020-8ad5-45a6e64406d7.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/lovable-uploads/8ffa4875-a4db-4020-8ad5-45a6e64406d7.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/lovable-uploads/8ffa4875-a4db-4020-8ad5-45a6e64406d7.png",
+      "sizes": "167x167",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/lovable-uploads/8ffa4875-a4db-4020-8ad5-45a6e64406d7.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/lovable-uploads/8ffa4875-a4db-4020-8ad5-45a6e64406d7.png",
+      "sizes": "120x120",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
