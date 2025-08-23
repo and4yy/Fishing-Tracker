@@ -12,6 +12,7 @@ export interface InvoiceData {
   };
   boat: BoatSettings;
   fishSale: FishSale;
+  tripType: string;
 }
 
 export const generateInvoiceNumber = (): string => {
@@ -24,7 +25,7 @@ export const generateInvoiceNumber = (): string => {
 };
 
 export const generateInvoicePDF = (invoiceData: InvoiceData): string => {
-  const { invoiceNumber, date, customer, boat, fishSale } = invoiceData;
+  const { invoiceNumber, date, customer, boat, fishSale, tripType } = invoiceData;
   
   // Calculate due date (14 days from invoice date)
   const dueDate = new Date(date);
@@ -48,20 +49,20 @@ export const generateInvoicePDF = (invoiceData: InvoiceData): string => {
         
         @page {
             size: A4;
-            margin: 15mm;
+            margin: 10mm 15mm;
         }
         
         body {
             font-family: 'Inter', Arial, sans-serif;
-            font-size: 14px;
-            line-height: 1.4;
+            font-size: 13px;
+            line-height: 1.3;
             color: #333;
             background: white;
+            max-width: 180mm;
+            margin: 0 auto;
         }
         
         .invoice-container {
-            max-width: 210mm;
-            margin: 0 auto;
             background: white;
             padding: 0;
         }
@@ -70,21 +71,21 @@ export const generateInvoicePDF = (invoiceData: InvoiceData): string => {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 30px;
-            padding-bottom: 15px;
+            margin-bottom: 25px;
+            padding-bottom: 12px;
         }
         
         .company-info h1 {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 600;
             color: #333;
-            margin-bottom: 4px;
+            margin-bottom: 3px;
         }
         
         .company-details {
-            font-size: 12px;
+            font-size: 11px;
             color: #666;
-            line-height: 1.3;
+            line-height: 1.2;
         }
         
         .invoice-title {
@@ -92,47 +93,47 @@ export const generateInvoicePDF = (invoiceData: InvoiceData): string => {
         }
         
         .invoice-title h2 {
-            font-size: 32px;
+            font-size: 28px;
             font-weight: 700;
             color: #333;
             letter-spacing: 1px;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
         
         .logo-container {
-            width: 80px;
-            height: 60px;
+            width: 70px;
+            height: 50px;
             border: 2px dashed #ddd;
-            border-radius: 8px;
+            border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 11px;
+            font-size: 10px;
             color: #666;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
         
         .invoice-details {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin-bottom: 40px;
+            gap: 25px;
+            margin-bottom: 30px;
         }
         
         .bill-to h3,
         .invoice-meta h3 {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
             color: #333;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
         
         .bill-to-details {
-            font-size: 13px;
+            font-size: 12px;
             color: #333;
-            line-height: 1.4;
+            line-height: 1.3;
         }
         
         .invoice-meta-table {
@@ -140,14 +141,14 @@ export const generateInvoicePDF = (invoiceData: InvoiceData): string => {
         }
         
         .invoice-meta-table td {
-            padding: 4px 0;
-            font-size: 13px;
+            padding: 3px 0;
+            font-size: 12px;
         }
         
         .invoice-meta-table .label {
             font-weight: 600;
             color: #333;
-            width: 100px;
+            width: 90px;
         }
         
         .invoice-meta-table .value {
@@ -157,7 +158,7 @@ export const generateInvoicePDF = (invoiceData: InvoiceData): string => {
         .items-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
         
         .items-table thead {
@@ -166,10 +167,10 @@ export const generateInvoicePDF = (invoiceData: InvoiceData): string => {
         }
         
         .items-table th {
-            padding: 12px 8px;
+            padding: 10px 8px;
             text-align: left;
             font-weight: 600;
-            font-size: 12px;
+            font-size: 11px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
@@ -179,9 +180,9 @@ export const generateInvoicePDF = (invoiceData: InvoiceData): string => {
         }
         
         .items-table tbody td {
-            padding: 12px 8px;
+            padding: 10px 8px;
             border-bottom: 1px solid #e2e8f0;
-            font-size: 13px;
+            font-size: 12px;
         }
         
         .items-table tbody td:last-child {
@@ -191,8 +192,8 @@ export const generateInvoicePDF = (invoiceData: InvoiceData): string => {
         
         .totals {
             margin-left: auto;
-            width: 300px;
-            margin-bottom: 30px;
+            width: 280px;
+            margin-bottom: 25px;
         }
         
         .totals table {
@@ -201,13 +202,13 @@ export const generateInvoicePDF = (invoiceData: InvoiceData): string => {
         }
         
         .totals td {
-            padding: 6px 0;
-            font-size: 13px;
+            padding: 5px 0;
+            font-size: 12px;
         }
         
         .totals .label {
             text-align: right;
-            padding-right: 20px;
+            padding-right: 15px;
             font-weight: 500;
         }
         
@@ -222,48 +223,45 @@ export const generateInvoicePDF = (invoiceData: InvoiceData): string => {
         
         .total-line .label,
         .total-line .value {
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 700;
-            padding-top: 10px;
+            padding-top: 8px;
         }
         
         .footer {
-            margin-top: 40px;
-            padding-top: 20px;
+            margin-top: 30px;
+            padding-top: 15px;
             border-top: 1px solid #e2e8f0;
         }
         
         .terms h4 {
-            font-size: 14px;
+            font-size: 12px;
             font-weight: 600;
             color: #333;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
         
         .terms p {
-            font-size: 12px;
-            color: #666;
-            line-height: 1.4;
-            margin-bottom: 4px;
-        }
-        
-        .payment-status {
-            display: inline-block;
-            padding: 4px 8px;
-            border-radius: 4px;
             font-size: 11px;
+            color: #666;
+            line-height: 1.3;
+            margin-bottom: 3px;
+        }
+        
+        .payment-info {
+            margin-bottom: 15px;
+        }
+        
+        .payment-info h4 {
+            font-size: 12px;
             font-weight: 600;
-            text-transform: uppercase;
+            margin-bottom: 6px;
         }
         
-        .paid {
-            background-color: #10b981;
-            color: white;
-        }
-        
-        .unpaid {
-            background-color: #f59e0b;
-            color: white;
+        .payment-info div {
+            font-size: 11px;
+            color: #666;
+            line-height: 1.3;
         }
         
         @media print {
@@ -283,7 +281,7 @@ export const generateInvoicePDF = (invoiceData: InvoiceData): string => {
         <div class="header">
             <div class="company-section">
                 ${boat.logoUrl ? `
-                <img src="${boat.logoUrl}" alt="Company Logo" style="width: 80px; height: 60px; object-fit: contain; margin-bottom: 10px; border-radius: 4px;">
+                <img src="${boat.logoUrl}" alt="Company Logo" style="width: 70px; height: 50px; object-fit: contain; margin-bottom: 8px; border-radius: 4px;">
                 ` : `
                 <div class="logo-container">
                     ⚓ Upload Logo
@@ -342,7 +340,7 @@ export const generateInvoicePDF = (invoiceData: InvoiceData): string => {
             <tbody>
                 <tr>
                     <td>${fishSale.weight} kg</td>
-                    <td>Fresh Fish Catch</td>
+                    <td>Fresh Fish Catch (${tripType})</td>
                     <td>MVR ${fishSale.ratePrice.toFixed(2)}</td>
                     <td>MVR ${fishSale.totalAmount.toFixed(2)}</td>
                 </tr>
@@ -363,9 +361,9 @@ export const generateInvoicePDF = (invoiceData: InvoiceData): string => {
         </div>
 
         ${boat.bankName ? `
-        <div style="margin-bottom: 20px;">
-            <h4 style="font-size: 13px; font-weight: 600; margin-bottom: 8px;">Payment Information</h4>
-            <div style="font-size: 12px; color: #666; line-height: 1.4;">
+        <div class="payment-info">
+            <h4>Payment Information</h4>
+            <div>
                 Bank: ${boat.bankName}<br>
                 Account Holder: ${boat.accountName}<br>
                 Account Number: ${boat.accountNumber}

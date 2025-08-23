@@ -139,7 +139,8 @@ export function TripForm({ onSubmit, onSaveBasic, initialData, isEditing = false
           contact: fishSale.contact
         },
         boat: boatSettings,
-        fishSale
+        fishSale,
+        tripType: formData.tripType
       };
 
       if (action === 'download') {
