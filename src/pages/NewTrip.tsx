@@ -36,7 +36,7 @@ export default function NewTrip() {
         crew: partialTrip.crew || [],
         expenses: partialTrip.expenses || { fuel: 0, food: 0, other: 0 },
         fishSales: partialTrip.fishSales || [],
-        tripType: partialTrip.tripType || 'Day',
+        tripType: partialTrip.tripType || 'Private Hire',
         totalCatch: 0,
         totalSales: 0,
         profit: 0,

@@ -20,7 +20,7 @@ export interface FishingTrip {
   crew: string[];
   expenses: Expense;
   fishSales: FishSale[];
-  tripType: 'Day' | 'Night' | 'Deep sea' | 'Reef' | 'Coastal' | 'Other';
+  tripType: 'Private Hire' | 'Yellow Fin Tuna' | 'Reef Fish' | 'Kalhubilamas' | 'Latti/Raagondi';
   totalCatch: number; // kg
   totalSales: number; // MVR
   profit: number;

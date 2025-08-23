@@ -109,6 +109,15 @@ export const generateInvoicePDF = (invoiceData: InvoiceData): string => {
         </tbody>
     </table>
 
+    ${boat.bankName ? `
+    <div style="margin-top: 20px; padding: 15px; background-color: #f8f9fa; border-radius: 5px;">
+        <div class="section-title">Payment Details</div>
+        <div class="info-item"><span class="label">Bank:</span> ${boat.bankName}</div>
+        <div class="info-item"><span class="label">Account Name:</span> ${boat.accountName}</div>
+        <div class="info-item"><span class="label">Account Number:</span> ${boat.accountNumber}</div>
+    </div>
+    ` : ''}
+
     <div class="footer">
         <p>Thank you for your business!</p>
         <p style="font-size: 12px;">This is a computer generated invoice.</p>

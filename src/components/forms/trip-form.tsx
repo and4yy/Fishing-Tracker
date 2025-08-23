@@ -20,7 +20,7 @@ interface TripFormProps {
   isEditing?: boolean;
 }
 
-const tripTypes: Array<FishingTrip['tripType']> = ['Day', 'Night', 'Deep sea', 'Reef', 'Coastal', 'Other'];
+const tripTypes: Array<FishingTrip['tripType']> = ['Private Hire', 'Yellow Fin Tuna', 'Reef Fish', 'Kalhubilamas', 'Latti/Raagondi'];
 
 export function TripForm({ onSubmit, onSaveBasic, initialData, isEditing = false }: TripFormProps) {
   const { toast } = useToast();

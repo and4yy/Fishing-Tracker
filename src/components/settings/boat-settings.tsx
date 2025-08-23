@@ -21,7 +21,10 @@ export const BoatSettingsService = {
         email: '',
         address: '',
         registrationNumber: '',
-        logoUrl: ''
+        logoUrl: '',
+        bankName: '',
+        accountNumber: '',
+        accountName: ''
       };
     } catch (error) {
       console.error('Error loading boat settings:', error);
@@ -32,7 +35,10 @@ export const BoatSettingsService = {
         email: '',
         address: '',
         registrationNumber: '',
-        logoUrl: ''
+        logoUrl: '',
+        bankName: '',
+        accountNumber: '',
+        accountName: ''
       };
     }
   },
@@ -61,7 +67,10 @@ export function BoatSettingsForm({ onSave, onClose }: BoatSettingsFormProps) {
     email: '',
     address: '',
     registrationNumber: '',
-    logoUrl: ''
+    logoUrl: '',
+    bankName: '',
+    accountNumber: '',
+    accountName: ''
   });
 
   useEffect(() => {
@@ -236,6 +245,39 @@ export function BoatSettingsForm({ onSave, onClose }: BoatSettingsFormProps) {
             onChange={(e) => updateSetting('address', e.target.value)}
             rows={3}
           />
+        </div>
+
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold">Bank Details</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="bankName">Bank Name</Label>
+              <Input
+                id="bankName"
+                placeholder="Enter bank name"
+                value={settings.bankName}
+                onChange={(e) => updateSetting('bankName', e.target.value)}
+              />
+            </div>
+            <div>
+              <Label htmlFor="accountName">Account Name</Label>
+              <Input
+                id="accountName"
+                placeholder="Enter account holder name"
+                value={settings.accountName}
+                onChange={(e) => updateSetting('accountName', e.target.value)}
+              />
+            </div>
+          </div>
+          <div>
+            <Label htmlFor="accountNumber">Account Number</Label>
+            <Input
+              id="accountNumber"
+              placeholder="Enter account number"
+              value={settings.accountNumber}
+              onChange={(e) => updateSetting('accountNumber', e.target.value)}
+            />
+          </div>
         </div>
 
         <div className="flex gap-2 pt-4">

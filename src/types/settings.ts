@@ -6,4 +6,7 @@ export interface BoatSettings {
   address: string;
   registrationNumber: string;
   logoUrl?: string;
+  bankName: string;
+  accountNumber: string;
+  accountName: string;
 }

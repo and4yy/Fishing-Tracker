@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { TripList } from "@/components/trips/trip-list";
+import { PaymentStatusUpdater } from "@/components/trips/payment-status-updater";
 import { StorageService } from "@/lib/storage";
 import { FishingTrip } from "@/types/fishing";
 import { Search, Filter } from "lucide-react";
@@ -72,6 +73,22 @@ export default function TripHistory() {
     }
   };
 
+  const handleUpdateTrip = (updatedTrip: FishingTrip) => {
+    try {
+      StorageService.saveTrip(updatedTrip);
+      const updatedTrips = trips.map(trip => 
+        trip.id === updatedTrip.id ? updatedTrip : trip
+      );
+      setTrips(updatedTrips);
+    } catch (error) {
+      toast({
+        title: "Error updating payment status",
+        description: "There was a problem updating the payment status.",
+        variant: "destructive"
+      });
+    }
+  };
+
   const tripTypes = Array.from(new Set(trips.map(trip => trip.tripType)));
 
   return (
@@ -113,6 +130,14 @@ export default function TripHistory() {
       <div className="text-sm text-muted-foreground">
         Showing {filteredTrips.length} of {trips.length} trips
       </div>
+
+      {/* Payment Status Updater */}
+      {trips.length > 0 && (
+        <PaymentStatusUpdater
+          trips={trips}
+          onUpdateTrip={handleUpdateTrip}
+        />
+      )}
 
       {/* Trip List */}
       <TripList
