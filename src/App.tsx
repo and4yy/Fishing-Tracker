@@ -24,7 +24,7 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <div className="min-h-screen bg-background flex flex-col">
-            <main className="flex-1 pb-16">
+            <main className="flex-1">
               <Routes>
                 <Route path="/" element={<Dashboard />} />
                 <Route path="/new-trip" element={<NewTrip />} />
@@ -35,8 +35,8 @@ const App = () => (
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>
-            <BottomNavigation />
             <Footer />
+            <BottomNavigation />
           </div>
         </BrowserRouter>
       </TooltipProvider>
