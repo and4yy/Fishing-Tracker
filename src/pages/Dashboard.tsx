@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { SummaryCards } from "@/components/dashboard/summary-cards";
+import { UnpaidSalesNotification } from "@/components/notifications/unpaid-sales-notification";
 import { StorageService } from "@/lib/storage";
 import { exportToExcel } from "@/lib/export";
 import { TripSummary } from "@/types/fishing";
@@ -92,6 +93,7 @@ export default function Dashboard() {
             </div>
           </div>
           <div className="flex gap-2 shrink-0">
+            <UnpaidSalesNotification />
             <Button 
               variant="outline" 
               size="icon"
