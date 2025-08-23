@@ -72,7 +72,7 @@ export default function Dashboard() {
             <div>
               <h1 className="text-3xl font-bold">Fishing Tracker</h1>
               <p className="text-muted-foreground">
-                Welcome, {user?.phone || 'Fisher'}
+                Welcome, {user?.user_metadata?.full_name || user?.email || 'Fisher'}
               </p>
             </div>
           </div>

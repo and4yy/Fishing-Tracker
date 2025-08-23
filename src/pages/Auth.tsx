@@ -1,19 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { Anchor, ArrowLeft, Smartphone } from 'lucide-react';
+import { Anchor } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export default function Auth() {
-  const [step, setStep] = useState<'phone' | 'otp'>('phone');
-  const [phone, setPhone] = useState('');
-  const [otp, setOtp] = useState('');
   const [loading, setLoading] = useState(false);
-  const { signInWithPhone, verifyOtp, user } = useAuth();
+  const { signInWithGoogle, user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -24,80 +19,19 @@ export default function Auth() {
     }
   }, [user, navigate]);
 
-  const handlePhoneSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!phone.trim()) {
-      toast({
-        title: 'Phone number required',
-        description: 'Please enter your phone number.',
-        variant: 'destructive'
-      });
-      return;
-    }
-
+  const handleGoogleSignIn = async () => {
     setLoading(true);
-    const { error } = await signInWithPhone(phone);
+    const { error } = await signInWithGoogle();
     
     if (error) {
       toast({
-        title: 'Failed to send OTP',
-        description: error.message || 'Could not send verification code. Please try again.',
+        title: 'Sign in failed',
+        description: error.message || 'Could not sign in with Google. Please try again.',
         variant: 'destructive'
       });
-    } else {
-      setStep('otp');
-      toast({
-        title: 'OTP sent!',
-        description: 'Check your phone for the verification code.'
-      });
+      setLoading(false);
     }
-    setLoading(false);
-  };
-
-  const handleOtpSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (otp.length !== 6) {
-      toast({
-        title: 'Invalid OTP',
-        description: 'Please enter the 6-digit verification code.',
-        variant: 'destructive'
-      });
-      return;
-    }
-
-    setLoading(true);
-    const { error } = await verifyOtp(phone, otp);
-    
-    if (error) {
-      toast({
-        title: 'Verification failed',
-        description: error.message || 'Invalid verification code. Please try again.',
-        variant: 'destructive'
-      });
-    } else {
-      toast({
-        title: 'Welcome!',
-        description: 'Successfully signed in to Fishing Tracker.'
-      });
-      // Navigation will happen automatically via useEffect when user state changes
-    }
-    setLoading(false);
-  };
-
-  const formatPhoneNumber = (value: string) => {
-    // Remove non-digit characters
-    const digits = value.replace(/\D/g, '');
-    
-    // Add + prefix if not present and has digits
-    if (digits && !value.startsWith('+')) {
-      return '+' + digits;
-    }
-    return value;
-  };
-
-  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const formatted = formatPhoneNumber(e.target.value);
-    setPhone(formatted);
+    // Don't set loading to false on success - user will be redirected
   };
 
   return (
@@ -118,101 +52,38 @@ export default function Auth() {
 
         <Card>
           <CardHeader className="text-center">
-            <CardTitle className="flex items-center justify-center gap-2">
-              <Smartphone className="h-5 w-5" />
-              {step === 'phone' ? 'Enter Phone Number' : 'Enter Verification Code'}
-            </CardTitle>
+            <CardTitle>Welcome Back</CardTitle>
             <CardDescription>
-              {step === 'phone' 
-                ? 'We\'ll send you a verification code via SMS' 
-                : `We sent a 6-digit code to ${phone}`
-              }
+              Sign in to your Fishing Tracker account
             </CardDescription>
           </CardHeader>
           
           <CardContent className="space-y-4">
-            {step === 'phone' ? (
-              <form onSubmit={handlePhoneSubmit} className="space-y-4">
-                <div className="space-y-2">
-                  <label htmlFor="phone" className="text-sm font-medium">
-                    Phone Number
-                  </label>
-                  <Input
-                    id="phone"
-                    type="tel"
-                    placeholder="+960 123 4567"
-                    value={phone}
-                    onChange={handlePhoneChange}
-                    disabled={loading}
-                    className="text-center"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Include country code (e.g., +960 for Maldives)
-                  </p>
-                </div>
-                
-                <Button 
-                  type="submit" 
-                  className="w-full" 
-                  disabled={loading || !phone.trim()}
-                >
-                  {loading ? 'Sending...' : 'Send Verification Code'}
-                </Button>
-              </form>
-            ) : (
-              <form onSubmit={handleOtpSubmit} className="space-y-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">
-                    Verification Code
-                  </label>
-                  <div className="flex justify-center">
-                    <InputOTP
-                      value={otp}
-                      onChange={setOtp}
-                      maxLength={6}
-                      disabled={loading}
-                    >
-                      <InputOTPGroup>
-                        <InputOTPSlot index={0} />
-                        <InputOTPSlot index={1} />
-                        <InputOTPSlot index={2} />
-                        <InputOTPSlot index={3} />
-                        <InputOTPSlot index={4} />
-                        <InputOTPSlot index={5} />
-                      </InputOTPGroup>
-                    </InputOTP>
-                  </div>
-                </div>
-
-                <Button 
-                  type="submit" 
-                  className="w-full" 
-                  disabled={loading || otp.length !== 6}
-                >
-                  {loading ? 'Verifying...' : 'Verify Code'}
-                </Button>
-
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="w-full"
-                  onClick={() => {
-                    setStep('phone');
-                    setOtp('');
-                  }}
-                  disabled={loading}
-                >
-                  <ArrowLeft className="h-4 w-4 mr-2" />
-                  Back to Phone Number
-                </Button>
-              </form>
-            )}
+            <Button 
+              onClick={handleGoogleSignIn}
+              disabled={loading}
+              className="w-full flex items-center gap-3"
+              variant="outline"
+            >
+              <svg className="w-5 h-5" viewBox="0 0 24 24">
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+              </svg>
+              {loading ? 'Signing in...' : 'Continue with Google'}
+            </Button>
           </CardContent>
         </Card>
 
-        <p className="text-xs text-center text-muted-foreground">
-          By signing in, you agree to use Fishing Tracker responsibly
-        </p>
+        <div className="text-center space-y-2">
+          <p className="text-xs text-muted-foreground">
+            By signing in, you agree to use Fishing Tracker responsibly
+          </p>
+          <p className="text-xs text-muted-foreground">
+            <strong>Setup Required:</strong> Configure Google OAuth in Supabase Dashboard
+          </p>
+        </div>
       </div>
     </div>
   );

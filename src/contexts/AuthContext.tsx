@@ -6,8 +6,7 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
-  signInWithPhone: (phone: string) => Promise<{ error: any }>;
-  verifyOtp: (phone: string, token: string) => Promise<{ error: any }>;
+  signInWithGoogle: () => Promise<{ error: any }>;
   signOut: () => Promise<void>;
 }
 
@@ -15,8 +14,7 @@ const AuthContext = createContext<AuthContextType>({
   user: null,
   session: null,
   loading: true,
-  signInWithPhone: async () => ({ error: null }),
-  verifyOtp: async () => ({ error: null }),
+  signInWithGoogle: async () => ({ error: null }),
   signOut: async () => {},
 });
 
@@ -56,28 +54,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => subscription.unsubscribe();
   }, []);
 
-  const signInWithPhone = async (phone: string) => {
+  const signInWithGoogle = async () => {
     try {
-      const { error } = await supabase.auth.signInWithOtp({
-        phone,
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
         options: {
-          data: {
-            display_name: phone
-          }
+          redirectTo: `${window.location.origin}/`
         }
-      });
-      return { error };
-    } catch (error) {
-      return { error };
-    }
-  };
-
-  const verifyOtp = async (phone: string, token: string) => {
-    try {
-      const { error } = await supabase.auth.verifyOtp({
-        phone,
-        token,
-        type: 'sms'
       });
       return { error };
     } catch (error) {
@@ -107,8 +90,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     user,
     session,
     loading,
-    signInWithPhone,
-    verifyOtp,
+    signInWithGoogle,
     signOut,
   };
 
