@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { BoatSettings } from "@/types/settings";
 import { useToast } from "@/hooks/use-toast";
-import { Save } from "lucide-react";
+import { Save, Upload, X } from "lucide-react";
 
 const SETTINGS_KEY = 'boat-settings';
 
@@ -20,7 +20,8 @@ export const BoatSettingsService = {
         contactNumber: '',
         email: '',
         address: '',
-        registrationNumber: ''
+        registrationNumber: '',
+        logoUrl: ''
       };
     } catch (error) {
       console.error('Error loading boat settings:', error);
@@ -30,7 +31,8 @@ export const BoatSettingsService = {
         contactNumber: '',
         email: '',
         address: '',
-        registrationNumber: ''
+        registrationNumber: '',
+        logoUrl: ''
       };
     }
   },
@@ -58,7 +60,8 @@ export function BoatSettingsForm({ onSave, onClose }: BoatSettingsFormProps) {
     contactNumber: '',
     email: '',
     address: '',
-    registrationNumber: ''
+    registrationNumber: '',
+    logoUrl: ''
   });
 
   useEffect(() => {
@@ -86,6 +89,42 @@ export function BoatSettingsForm({ onSave, onClose }: BoatSettingsFormProps) {
 
   const updateSetting = (key: keyof BoatSettings, value: string) => {
     setSettings(prev => ({ ...prev, [key]: value }));
+  };
+
+  const handleLogoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      // Check file size (max 2MB)
+      if (file.size > 2 * 1024 * 1024) {
+        toast({
+          title: "File too large",
+          description: "Please select an image smaller than 2MB.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Check file type
+      if (!file.type.startsWith('image/')) {
+        toast({
+          title: "Invalid file type",
+          description: "Please select an image file.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const dataUrl = e.target?.result as string;
+        updateSetting('logoUrl', dataUrl);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeLogo = () => {
+    updateSetting('logoUrl', '');
   };
 
   return (
@@ -145,6 +184,47 @@ export function BoatSettingsForm({ onSave, onClose }: BoatSettingsFormProps) {
             value={settings.registrationNumber}
             onChange={(e) => updateSetting('registrationNumber', e.target.value)}
           />
+        </div>
+
+        <div>
+          <Label htmlFor="logo">Boat Logo</Label>
+          <div className="space-y-2">
+            {settings.logoUrl ? (
+              <div className="flex items-center gap-4">
+                <img 
+                  src={settings.logoUrl} 
+                  alt="Boat logo" 
+                  className="h-16 w-16 object-contain border rounded"
+                />
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={removeLogo}
+                >
+                  <X className="h-4 w-4 mr-2" />
+                  Remove Logo
+                </Button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-4">
+                <Input
+                  id="logo"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleLogoUpload}
+                  className="hidden"
+                />
+                <Label htmlFor="logo" className="cursor-pointer">
+                  <div className="flex items-center gap-2 px-4 py-2 border border-input bg-background hover:bg-accent rounded-md">
+                    <Upload className="h-4 w-4" />
+                    Upload Logo
+                  </div>
+                </Label>
+                <span className="text-sm text-muted-foreground">Max 2MB, image files only</span>
+              </div>
+            )}
+          </div>
         </div>
 
         <div>

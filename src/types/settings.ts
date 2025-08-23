@@ -5,4 +5,5 @@ export interface BoatSettings {
   email: string;
   address: string;
   registrationNumber: string;
+  logoUrl?: string;
 }

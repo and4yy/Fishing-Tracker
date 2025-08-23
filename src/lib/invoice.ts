@@ -53,8 +53,13 @@ export const generateInvoicePDF = (invoiceData: InvoiceData): string => {
 <body>
     <div class="header">
         <div>
-            <div class="logo">🚢 ${boat.boatName}</div>
-            <div style="margin-top: 5px; color: #666;">Fishing Invoice</div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                ${boat.logoUrl ? `<img src="${boat.logoUrl}" alt="Boat logo" style="height: 40px; width: 40px; object-fit: contain;">` : '🚢'}
+                <div>
+                    <div class="logo">${boat.boatName}</div>
+                    <div style="margin-top: 5px; color: #666;">Fishing Invoice</div>
+                </div>
+            </div>
         </div>
         <div class="invoice-number">Invoice #${invoiceNumber}</div>
     </div>
