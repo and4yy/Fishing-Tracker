@@ -4,8 +4,9 @@ import { SummaryCards } from "@/components/dashboard/summary-cards";
 import { StorageService } from "@/lib/storage";
 import { exportToExcel } from "@/lib/export";
 import { TripSummary } from "@/types/fishing";
-import { Download, Anchor, Settings } from "lucide-react";
+import { Download, Anchor, Settings, LogOut } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function Dashboard() {
   const [summary, setSummary] = useState<TripSummary>({
@@ -16,6 +17,7 @@ export default function Dashboard() {
     averageProfit: 0,
   });
   const { toast } = useToast();
+  const { user, signOut } = useAuth();
 
   useEffect(() => {
     const loadSummary = () => {
@@ -69,19 +71,30 @@ export default function Dashboard() {
             </div>
             <div>
               <h1 className="text-3xl font-bold">Fishing Tracker</h1>
-              <p className="text-muted-foreground">Track your fishing adventures</p>
+              <p className="text-muted-foreground">
+                Welcome, {user?.phone || 'Fisher'}
+              </p>
             </div>
           </div>
-          <Button 
-            variant="outline" 
-            size="icon"
-            asChild
-            className="shrink-0"
-          >
-            <a href="/settings">
-              <Settings className="h-4 w-4" />
-            </a>
-          </Button>
+          <div className="flex gap-2 shrink-0">
+            <Button 
+              variant="outline" 
+              size="icon"
+              asChild
+            >
+              <a href="/settings">
+                <Settings className="h-4 w-4" />
+              </a>
+            </Button>
+            <Button 
+              variant="outline" 
+              size="icon"
+              onClick={signOut}
+              title="Sign out"
+            >
+              <LogOut className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
       </div>
 
