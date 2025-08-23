@@ -4,9 +4,8 @@ import { SummaryCards } from "@/components/dashboard/summary-cards";
 import { StorageService } from "@/lib/storage";
 import { exportToExcel } from "@/lib/export";
 import { TripSummary } from "@/types/fishing";
-import { Download, Anchor, Settings, LogOut } from "lucide-react";
+import { Download, Anchor, Settings } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/contexts/AuthContext";
 
 export default function Dashboard() {
   const [summary, setSummary] = useState<TripSummary>({
@@ -17,7 +16,6 @@ export default function Dashboard() {
     averageProfit: 0,
   });
   const { toast } = useToast();
-  const { user, signOut } = useAuth();
 
   useEffect(() => {
     const loadSummary = () => {
@@ -72,7 +70,7 @@ export default function Dashboard() {
             <div>
               <h1 className="text-3xl font-bold">Fishing Tracker</h1>
               <p className="text-muted-foreground">
-                Welcome, {user?.user_metadata?.full_name || user?.email || 'Fisher'}
+                Track your fishing adventures and profits
               </p>
             </div>
           </div>
@@ -85,14 +83,6 @@ export default function Dashboard() {
               <a href="/settings">
                 <Settings className="h-4 w-4" />
               </a>
-            </Button>
-            <Button 
-              variant="outline" 
-              size="icon"
-              onClick={signOut}
-              title="Sign out"
-            >
-              <LogOut className="h-4 w-4" />
             </Button>
           </div>
         </div>
