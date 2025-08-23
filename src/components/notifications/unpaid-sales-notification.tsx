@@ -29,15 +29,18 @@ export function UnpaidSalesNotification() {
     const unpaid: UnpaidSaleWithTrip[] = [];
     
     trips.forEach(trip => {
-      trip.fishSales.forEach(sale => {
-        if (!sale.paid) {
-          unpaid.push({
-            ...sale,
-            tripId: trip.id,
-            tripDate: trip.date
-          });
-        }
-      });
+      // Safety check: ensure fishSales exists and is an array
+      if (trip.fishSales && Array.isArray(trip.fishSales)) {
+        trip.fishSales.forEach(sale => {
+          if (!sale.paid) {
+            unpaid.push({
+              ...sale,
+              tripId: trip.id,
+              tripDate: trip.date
+            });
+          }
+        });
+      }
     });
     
     setUnpaidSales(unpaid);
@@ -57,7 +60,7 @@ export function UnpaidSalesNotification() {
     const trips = StorageService.getAllTrips();
     const trip = trips.find(t => t.id === tripId);
     
-    if (trip) {
+    if (trip && trip.fishSales && Array.isArray(trip.fishSales)) {
       const sale = trip.fishSales.find(s => s.id === saleId);
       if (sale) {
         sale.paid = true;
