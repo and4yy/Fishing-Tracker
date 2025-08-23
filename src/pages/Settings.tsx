@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { BoatSettingsForm } from "@/components/settings/boat-settings";
+import { UserAuth } from "@/components/auth/UserAuth";
 import { ArrowLeft } from "lucide-react";
 
 export default function Settings() {
@@ -14,10 +15,11 @@ export default function Settings() {
         </Button>
         <div>
           <h1 className="text-2xl font-bold">Settings</h1>
-          <p className="text-muted-foreground">Configure your boat details for invoices</p>
+          <p className="text-muted-foreground">Configure your app and account preferences</p>
         </div>
       </div>
 
+      <UserAuth />
       <BoatSettingsForm onSave={() => navigate('/')} />
     </div>
   );
