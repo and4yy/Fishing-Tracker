@@ -4,6 +4,8 @@ import { SummaryCards } from "@/components/dashboard/summary-cards";
 import { StorageService } from "@/lib/storage";
 import { exportToExcel } from "@/lib/export";
 import { TripSummary } from "@/types/fishing";
+import { BoatSettings } from "@/types/settings";
+import { BoatSettingsService } from "@/components/settings/boat-settings";
 import { Download, Anchor, Settings } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -15,18 +17,33 @@ export default function Dashboard() {
     totalProfit: 0,
     averageProfit: 0,
   });
+  const [boatSettings, setBoatSettings] = useState<BoatSettings>({
+    boatName: '',
+    ownerName: '',
+    contactNumber: '',
+    email: '',
+    address: '',
+    registrationNumber: '',
+    logoUrl: '',
+    bankName: '',
+    accountNumber: '',
+    accountName: ''
+  });
   const { toast } = useToast();
 
   useEffect(() => {
-    const loadSummary = () => {
+    const loadData = () => {
       const summaryData = StorageService.getSummary();
       setSummary(summaryData);
+      
+      const settings = BoatSettingsService.getSettings();
+      setBoatSettings(settings);
     };
 
-    loadSummary();
+    loadData();
     
     // Listen for storage changes
-    const handleStorageChange = () => loadSummary();
+    const handleStorageChange = () => loadData();
     window.addEventListener('storage', handleStorageChange);
     
     return () => window.removeEventListener('storage', handleStorageChange);
@@ -139,7 +156,12 @@ export default function Dashboard() {
             <Anchor className="h-12 w-12 text-white" />
           </div>
           <div>
-            <h3 className="text-lg font-medium mb-2">Welcome to Fishing Tracker</h3>
+            <h3 className="text-lg font-medium mb-2">
+              {boatSettings.boatName 
+                ? `Welcome aboard ${boatSettings.boatName}!` 
+                : 'Welcome to Fishing Tracker'
+              }
+            </h3>
             <p className="text-muted-foreground mb-6">Start tracking your fishing trips to see insights and manage your business.</p>
             <Button asChild>
               <a href="/new-trip">Record Your First Trip</a>
