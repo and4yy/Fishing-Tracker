@@ -1,5 +1,7 @@
 import { FishSale } from '@/types/fishing';
 import { BoatSettings } from '@/types/settings';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 export interface InvoiceData {
   invoiceNumber: string;
@@ -129,21 +131,53 @@ export const generateInvoicePDF = (invoiceData: InvoiceData): string => {
   return invoiceHTML;
 };
 
-export const downloadInvoiceAsPDF = (invoiceData: InvoiceData): void => {
+export const downloadInvoiceAsPDF = async (invoiceData: InvoiceData): Promise<void> => {
   const htmlContent = generateInvoicePDF(invoiceData);
   
-  // Create a blob with the HTML content
-  const blob = new Blob([htmlContent], { type: 'text/html' });
-  const url = URL.createObjectURL(blob);
-  
-  // Create a temporary link to download
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = `invoice-${invoiceData.invoiceNumber}.html`;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
+  // Create a temporary div to render the HTML
+  const tempDiv = document.createElement('div');
+  tempDiv.innerHTML = htmlContent;
+  tempDiv.style.position = 'absolute';
+  tempDiv.style.left = '-9999px';
+  tempDiv.style.top = '0';
+  tempDiv.style.width = '210mm'; // A4 width
+  tempDiv.style.backgroundColor = 'white';
+  document.body.appendChild(tempDiv);
+
+  try {
+    // Convert HTML to canvas
+    const canvas = await html2canvas(tempDiv, {
+      scale: 2,
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: '#ffffff'
+    });
+
+    // Create PDF
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const imgData = canvas.toDataURL('image/png');
+    
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+    
+    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+    pdf.save(`invoice-${invoiceData.invoiceNumber}.pdf`);
+  } catch (error) {
+    console.error('Error generating PDF:', error);
+    // Fallback to HTML download if PDF generation fails
+    const blob = new Blob([htmlContent], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `invoice-${invoiceData.invoiceNumber}.html`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  } finally {
+    // Clean up temporary div
+    document.body.removeChild(tempDiv);
+  }
 };
 
 export const printInvoice = (invoiceData: InvoiceData): void => {

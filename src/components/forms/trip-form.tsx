@@ -118,7 +118,7 @@ export function TripForm({ onSubmit, onSaveBasic, initialData, isEditing = false
     }
   };
 
-  const generateInvoice = (fishSale: FishSale, action: 'download' | 'print') => {
+  const generateInvoice = async (fishSale: FishSale, action: 'download' | 'print') => {
     try {
       const boatSettings = BoatSettingsService.getSettings();
       
@@ -143,10 +143,10 @@ export function TripForm({ onSubmit, onSaveBasic, initialData, isEditing = false
       };
 
       if (action === 'download') {
-        downloadInvoiceAsPDF(invoiceData);
+        await downloadInvoiceAsPDF(invoiceData);
         toast({
           title: "Invoice generated",
-          description: `Invoice for ${fishSale.name} has been downloaded.`
+          description: `Invoice for ${fishSale.name} has been downloaded as PDF.`
         });
       } else {
         printInvoice(invoiceData);
