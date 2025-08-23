@@ -78,7 +78,11 @@ export function UnpaidSalesNotification() {
   const totalUnpaidAmount = unpaidSales.reduce((sum, sale) => sum + sale.totalAmount, 0);
 
   if (unpaidSales.length === 0) {
-    return null;
+    return (
+      <Button variant="outline" size="sm" className="relative">
+        <Bell className="h-4 w-4" />
+      </Button>
+    );
   }
 
   return (
