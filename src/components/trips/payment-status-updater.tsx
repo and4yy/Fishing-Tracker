@@ -22,7 +22,7 @@ export function PaymentStatusUpdater({ trips, onUpdateTrip }: PaymentStatusUpdat
     
     const updatedTrip = {
       ...trip,
-      fishSales: trip.fishSales.map(sale =>
+      fishSales: (trip.fishSales || []).map(sale =>
         sale.id === saleId ? { ...sale, paid } : sale
       )
     };
@@ -44,7 +44,7 @@ export function PaymentStatusUpdater({ trips, onUpdateTrip }: PaymentStatusUpdat
   };
 
   const unpaidSales = trips.flatMap(trip => 
-    trip.fishSales
+    (trip.fishSales || [])
       .filter(sale => !sale.paid)
       .map(sale => ({ ...sale, tripId: trip.id, tripDate: trip.date }))
   );
