@@ -7,7 +7,7 @@ import { exportToExcel } from "@/lib/export";
 import { TripSummary } from "@/types/fishing";
 import { BoatSettings } from "@/types/settings";
 import { BoatSettingsService } from "@/components/settings/boat-settings";
-import { Download, Anchor, Settings } from "lucide-react";
+import { Download, Anchor, Settings, Sun, Cloud, Droplets, Wind } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 export default function Dashboard() {
@@ -131,6 +131,30 @@ export default function Dashboard() {
               : 'Welcome aboard!'
             }
           </h2>
+          {/* Weather Report */}
+          <div className="mt-4 p-4 bg-muted/50 rounded-lg max-w-sm mx-auto">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <Sun className="h-5 w-5 text-yellow-500" />
+                <span className="font-medium">Today's Conditions</span>
+              </div>
+              <span className="text-sm text-muted-foreground">28°C</span>
+            </div>
+            <div className="grid grid-cols-3 gap-3 text-xs">
+              <div className="flex items-center gap-1">
+                <Wind className="h-3 w-3 text-blue-500" />
+                <span>5 knots</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Droplets className="h-3 w-3 text-blue-600" />
+                <span>High tide</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Cloud className="h-3 w-3 text-gray-500" />
+                <span>Partly cloudy</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
