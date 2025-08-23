@@ -78,7 +78,36 @@ export default function Dashboard() {
 
   return (
     <div className="container mx-auto p-4 pb-20 space-y-6">
-      {/* Welcome Section */}
+      {/* Header */}
+      <div className="text-center space-y-2">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3 flex-1 justify-center">
+            <div className="p-3 ocean-gradient rounded-xl">
+              <Anchor className="h-8 w-8 text-white" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold">Fishing Tracker</h1>
+              <p className="text-muted-foreground">
+                Track your fishing adventures and profits
+              </p>
+            </div>
+          </div>
+          <div className="flex gap-2 shrink-0">
+            <UnpaidSalesNotification />
+            <Button 
+              variant="outline" 
+              size="icon"
+              asChild
+            >
+              <a href="/settings">
+                <Settings className="h-4 w-4" />
+              </a>
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* Welcome Aboard Section */}
       <div className="text-center space-y-4">
         <div className="flex items-center justify-center">
           <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-primary/20">
@@ -96,27 +125,12 @@ export default function Dashboard() {
           </div>
         </div>
         <div>
-          <h1 className="text-2xl font-bold">
+          <h2 className="text-xl font-semibold">
             {boatSettings.boatName 
               ? `Welcome aboard ${boatSettings.boatName}!` 
-              : 'Welcome to Fishing Tracker'
+              : 'Welcome aboard!'
             }
-          </h1>
-          <p className="text-muted-foreground">
-            Track your fishing adventures and profits
-          </p>
-        </div>
-        <div className="flex gap-2 justify-center">
-          <UnpaidSalesNotification />
-          <Button 
-            variant="outline" 
-            size="icon"
-            asChild
-          >
-            <a href="/settings">
-              <Settings className="h-4 w-4" />
-            </a>
-          </Button>
+          </h2>
         </div>
       </div>
 
