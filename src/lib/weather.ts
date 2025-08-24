@@ -113,9 +113,47 @@ export class WeatherService {
 
   static async getLocationFromCoords(latitude: number, longitude: number): Promise<string> {
     try {
-      // Using a simple reverse geocoding approach
+      // Using OpenStreetMap Nominatim reverse geocoding service
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&zoom=10`
+      );
+      
+      if (!response.ok) {
+        throw new Error('Geocoding service unavailable');
+      }
+      
+      const data = await response.json();
+      
+      if (data && data.display_name) {
+        // Extract relevant parts of the address
+        const addressParts = [];
+        
+        if (data.address) {
+          // Priority order for location components
+          const city = data.address.city || data.address.town || data.address.village || data.address.hamlet;
+          const state = data.address.state || data.address.region;
+          const country = data.address.country;
+          
+          if (city) addressParts.push(city);
+          if (state && state !== city) addressParts.push(state);
+          if (country) addressParts.push(country);
+        }
+        
+        // If we got meaningful address parts, use them; otherwise use display_name
+        if (addressParts.length > 0) {
+          return addressParts.join(', ');
+        } else {
+          // Fallback to shortened display name (first 50 chars)
+          return data.display_name.length > 50 
+            ? data.display_name.substring(0, 47) + '...'
+            : data.display_name;
+        }
+      }
+      
+      // Fallback to coordinates if no proper address found
       return `${latitude.toFixed(2)}°, ${longitude.toFixed(2)}°`;
     } catch (error) {
+      console.warn('Failed to get location name:', error);
       return `${latitude.toFixed(2)}°, ${longitude.toFixed(2)}°`;
     }
   }
