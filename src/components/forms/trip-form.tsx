@@ -7,11 +7,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FishingTrip, Expense, FishSale, HireDetails } from "@/types/fishing";
+import { FishingTrip, Expense, FishSale, HireDetails, WeatherConditions } from "@/types/fishing";
 import { calculateProfit, calculateProfitDistribution, generateTripId, generateFishSaleId } from "@/lib/calculations";
 import { generateInvoiceNumber, downloadInvoiceAsPDF, printInvoice } from "@/lib/invoice";
 import { BoatSettingsService } from "@/components/settings/boat-settings";
 import { Plus, Minus, Save, FileText, Printer } from "lucide-react";
+import { WeatherCard } from "@/components/weather/weather-card";
 import { useToast } from "@/hooks/use-toast";
 
 interface TripFormProps {
@@ -36,6 +37,7 @@ export function TripForm({ onSubmit, onSaveBasic, initialData, isEditing = false
       clientContact: '',
       specialRequests: ''
     },
+    weatherConditions: initialData?.weatherConditions || null as WeatherConditions | null,
     totalCatch: initialData?.totalCatch || 0,
     totalSales: initialData?.totalSales || 0,
     ownerSharePercent: initialData?.ownerSharePercent || 0,
@@ -211,6 +213,13 @@ export function TripForm({ onSubmit, onSaveBasic, initialData, isEditing = false
     }
   };
 
+  const handleWeatherData = (weather: WeatherConditions | null) => {
+    setFormData(prev => ({
+      ...prev,
+      weatherConditions: weather
+    }));
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -226,6 +235,7 @@ export function TripForm({ onSubmit, onSaveBasic, initialData, isEditing = false
       fishSales: formData.fishSales,
       tripType: formData.tripType,
       hireDetails: formData.tripType === 'Private Hire' ? formData.hireDetails : undefined,
+      weatherConditions: formData.weatherConditions || undefined,
       totalCatch: formData.totalCatch,
       totalSales: formData.totalSales,
       profit,
@@ -339,6 +349,11 @@ export function TripForm({ onSubmit, onSaveBasic, initialData, isEditing = false
           )}
         </CardContent>
       </Card>
+
+      <WeatherCard 
+        onWeatherData={handleWeatherData}
+        selectedDate={formData.date}
+      />
 
       <Card>
         <CardHeader>

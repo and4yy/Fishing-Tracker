@@ -21,6 +21,17 @@ export interface HireDetails {
   specialRequests?: string;
 }
 
+export interface WeatherConditions {
+  temperature: number;
+  humidity: number;
+  windSpeed: number;
+  windDirection: number;
+  weatherCode: number;
+  visibility: number;
+  pressure: number;
+  description: string;
+}
+
 export interface FishingTrip {
   id: string;
   date: string;
@@ -29,6 +40,7 @@ export interface FishingTrip {
   fishSales: FishSale[];
   tripType: 'Private Hire' | 'Yellow Fin Tuna' | 'Reef Fish' | 'Kalhubilamas' | 'Latti/Raagondi';
   hireDetails?: HireDetails;
+  weatherConditions?: WeatherConditions;
   totalCatch: number; // kg
   totalSales: number; // MVR
   profit: number;
