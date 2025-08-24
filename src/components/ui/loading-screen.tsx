@@ -13,7 +13,7 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({ isLoading, childre
       <div className="flex flex-col items-center space-y-6">
         <div className="relative">
           <img 
-            src="/lovable-uploads/c063a6aa-8ad8-4781-9381-c83508105007.png" 
+            src="/lovable-uploads/c2a36b36-2837-4b6e-9803-9d777bad3d39.png" 
             alt="Fishing Tracker Logo"
             className="w-24 h-24 animate-pulse"
           />
