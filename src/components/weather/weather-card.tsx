@@ -259,20 +259,25 @@ export function WeatherCard({ onWeatherData, selectedDate }: WeatherCardProps) {
                 const WeatherIcon = getWeatherIcon(day.weatherCode);
                 const fishingCondition = getFishingConditions(day);
                 
+                console.log('Rendering forecast day:', day.date, 'with conditions:', fishingCondition);
+                
                 return (
                   <Dialog key={day.date}>
                     <DialogTrigger asChild>
-                      <div 
-                        className={`flex items-center justify-between p-3 rounded-lg border cursor-pointer transition-colors hover:bg-accent/70 ${
+                      <button 
+                        className={`w-full flex items-center justify-between p-3 rounded-lg border cursor-pointer transition-colors hover:bg-accent/70 ${
                           day.date === selectedDate 
                             ? 'bg-primary/5 border-primary' 
                             : 'bg-card hover:bg-accent/50'
                         }`}
-                        onClick={() => setSelectedForecastDay(day)}
+                        onClick={() => {
+                          console.log('Forecast clicked:', day.date);
+                          setSelectedForecastDay(day);
+                        }}
                       >
                         <div className="flex items-center gap-3 flex-1">
                           <WeatherIcon className="h-8 w-8 text-primary" />
-                          <div className="flex-1">
+                          <div className="flex-1 text-left">
                             <div className="font-medium">
                               {index === 0 ? 'Today' : new Date(day.date).toLocaleDateString('en', { weekday: 'short', month: 'short', day: 'numeric' })}
                             </div>
@@ -293,7 +298,7 @@ export function WeatherCard({ onWeatherData, selectedDate }: WeatherCardProps) {
                             {fishingCondition.condition}
                           </div>
                         </div>
-                      </div>
+                      </button>
                     </DialogTrigger>
                     
                     <DialogContent className="max-w-md">
