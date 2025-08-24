@@ -34,7 +34,8 @@ export function TripForm({ onSubmit, onSaveBasic, initialData, isEditing = false
       duration: 'Full Day' as HireDetails['duration'],
       clientName: '',
       clientContact: '',
-      specialRequests: ''
+      specialRequests: '',
+      hiredPrice: 0
     },
     totalCatch: initialData?.totalCatch || 0,
     totalSales: initialData?.totalSales || 0,
@@ -198,7 +199,7 @@ export function TripForm({ onSubmit, onSaveBasic, initialData, isEditing = false
     }));
   };
 
-  const updateHireDetails = (field: keyof HireDetails, value: string) => {
+  const updateHireDetails = (field: keyof HireDetails, value: string | number) => {
     setFormData(prev => ({
       ...prev,
       hireDetails: { ...prev.hireDetails, [field]: value }
@@ -304,7 +305,7 @@ export function TripForm({ onSubmit, onSaveBasic, initialData, isEditing = false
                     </Select>
                   </div>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
                     <Label htmlFor="clientName">Client Name</Label>
                     <Input
@@ -321,6 +322,18 @@ export function TripForm({ onSubmit, onSaveBasic, initialData, isEditing = false
                       placeholder="Phone/Contact"
                       value={formData.hireDetails.clientContact}
                       onChange={(e) => updateHireDetails('clientContact', e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="hiredPrice">Hired Price (MVR)</Label>
+                    <Input
+                      id="hiredPrice"
+                      type="number"
+                      step="0.01"
+                      placeholder="0.00"
+                      value={formData.hireDetails.hiredPrice || ''}
+                      onFocus={handleNumberFocus}
+                      onChange={(e) => updateHireDetails('hiredPrice', parseFloat(e.target.value) || 0)}
                     />
                   </div>
                 </div>

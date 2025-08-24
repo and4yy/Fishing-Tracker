@@ -19,6 +19,7 @@ export interface HireDetails {
   clientName?: string;
   clientContact?: string;
   specialRequests?: string;
+  hiredPrice?: number;
 }
 
 export interface WeatherConditions {
