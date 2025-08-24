@@ -16,8 +16,6 @@ export interface FishSale {
 
 export interface HireDetails {
   duration: 'Full Day' | 'Half Day' | 'Night Fishing';
-  startTime?: string;
-  endTime?: string;
   clientName?: string;
   clientContact?: string;
   specialRequests?: string;

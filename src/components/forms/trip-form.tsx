@@ -32,8 +32,6 @@ export function TripForm({ onSubmit, onSaveBasic, initialData, isEditing = false
     tripType: initialData?.tripType || 'Private Hire' as FishingTrip['tripType'],
     hireDetails: initialData?.hireDetails || { 
       duration: 'Full Day' as HireDetails['duration'],
-      startTime: '',
-      endTime: '',
       clientName: '',
       clientContact: '',
       specialRequests: ''
@@ -288,7 +286,7 @@ export function TripForm({ onSubmit, onSaveBasic, initialData, isEditing = false
                 </div>
               </TabsContent>
               <TabsContent value="hire" className="mt-4 space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4">
                   <div>
                     <Label htmlFor="duration">Duration</Label>
                     <Select 
@@ -304,26 +302,6 @@ export function TripForm({ onSubmit, onSaveBasic, initialData, isEditing = false
                         <SelectItem value="Night Fishing">Night Fishing</SelectItem>
                       </SelectContent>
                     </Select>
-                  </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    <div>
-                      <Label htmlFor="startTime">Start Time</Label>
-                      <Input
-                        id="startTime"
-                        type="time"
-                        value={formData.hireDetails.startTime}
-                        onChange={(e) => updateHireDetails('startTime', e.target.value)}
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="endTime">End Time</Label>
-                      <Input
-                        id="endTime"
-                        type="time"
-                        value={formData.hireDetails.endTime}
-                        onChange={(e) => updateHireDetails('endTime', e.target.value)}
-                      />
-                    </div>
                   </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
