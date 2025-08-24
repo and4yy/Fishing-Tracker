@@ -10,18 +10,28 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({ isLoading, childre
 
   return (
     <div className="fixed inset-0 bg-background z-50 flex items-center justify-center">
-      <div className="flex flex-col items-center space-y-6">
+      <div className="flex flex-col items-center space-y-8 animate-fade-in">
         <div className="relative">
           <img 
-            src="/lovable-uploads/c2a36b36-2837-4b6e-9803-9d777bad3d39.png" 
-            alt="Fishing Tracker Logo"
-            className="w-24 h-24 animate-pulse"
+            src="/lovable-uploads/f4de85e3-f4f4-43d6-8017-db15188787eb.png" 
+            alt="Fishing Reel"
+            className="w-32 h-32 animate-spin animate-scale-in"
+            style={{ animationDuration: '3s' }}
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-accent/20 rounded-full animate-spin opacity-50"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-accent/10 rounded-full animate-pulse"></div>
         </div>
-        <div className="text-center">
-          <h2 className="text-xl font-semibold text-foreground mb-2">Fishing Tracker</h2>
-          <p className="text-sm text-muted-foreground">Loading your fishing adventures...</p>
+        <div className="text-center animate-fade-in" style={{ animationDelay: '0.5s' }}>
+          <h2 className="text-2xl font-bold text-foreground mb-2 animate-fade-in">Fishing Tracker</h2>
+          <p className="text-sm text-muted-foreground animate-fade-in" style={{ animationDelay: '0.7s' }}>
+            Reeling in your fishing adventures...
+          </p>
+          <div className="flex justify-center mt-4">
+            <div className="flex space-x-1">
+              <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0s' }}></div>
+              <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+              <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
