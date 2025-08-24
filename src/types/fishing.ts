@@ -14,6 +14,15 @@ export interface FishSale {
   paid: boolean;
 }
 
+export interface HireDetails {
+  duration: 'Full Day' | 'Half Day' | 'Night Fishing';
+  startTime?: string;
+  endTime?: string;
+  clientName?: string;
+  clientContact?: string;
+  specialRequests?: string;
+}
+
 export interface FishingTrip {
   id: string;
   date: string;
@@ -21,6 +30,7 @@ export interface FishingTrip {
   expenses: Expense;
   fishSales: FishSale[];
   tripType: 'Private Hire' | 'Yellow Fin Tuna' | 'Reef Fish' | 'Kalhubilamas' | 'Latti/Raagondi';
+  hireDetails?: HireDetails;
   totalCatch: number; // kg
   totalSales: number; // MVR
   profit: number;

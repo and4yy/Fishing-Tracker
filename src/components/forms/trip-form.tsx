@@ -6,7 +6,8 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import { FishingTrip, Expense, FishSale } from "@/types/fishing";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { FishingTrip, Expense, FishSale, HireDetails } from "@/types/fishing";
 import { calculateProfit, calculateProfitDistribution, generateTripId, generateFishSaleId } from "@/lib/calculations";
 import { generateInvoiceNumber, downloadInvoiceAsPDF, printInvoice } from "@/lib/invoice";
 import { BoatSettingsService } from "@/components/settings/boat-settings";
@@ -28,7 +29,15 @@ export function TripForm({ onSubmit, onSaveBasic, initialData, isEditing = false
     date: initialData?.date || new Date().toISOString().split('T')[0],
     crew: initialData?.crew || [''],
     expenses: initialData?.expenses || { fuel: 0, food: 0, other: 0 },
-    tripType: initialData?.tripType || 'Day' as FishingTrip['tripType'],
+    tripType: initialData?.tripType || 'Private Hire' as FishingTrip['tripType'],
+    hireDetails: initialData?.hireDetails || { 
+      duration: 'Full Day' as HireDetails['duration'],
+      startTime: '',
+      endTime: '',
+      clientName: '',
+      clientContact: '',
+      specialRequests: ''
+    },
     totalCatch: initialData?.totalCatch || 0,
     totalSales: initialData?.totalSales || 0,
     ownerSharePercent: initialData?.ownerSharePercent || 0,
@@ -191,6 +200,19 @@ export function TripForm({ onSubmit, onSaveBasic, initialData, isEditing = false
     }));
   };
 
+  const updateHireDetails = (field: keyof HireDetails, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      hireDetails: { ...prev.hireDetails, [field]: value }
+    }));
+  };
+
+  const handleNumberFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+    if (e.target.value === '0') {
+      e.target.value = '';
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -205,6 +227,7 @@ export function TripForm({ onSubmit, onSaveBasic, initialData, isEditing = false
       expenses: formData.expenses,
       fishSales: formData.fishSales,
       tripType: formData.tripType,
+      hireDetails: formData.tripType === 'Private Hire' ? formData.hireDetails : undefined,
       totalCatch: formData.totalCatch,
       totalSales: formData.totalSales,
       profit,
@@ -252,6 +275,90 @@ export function TripForm({ onSubmit, onSaveBasic, initialData, isEditing = false
               </Select>
             </div>
           </div>
+
+          {formData.tripType === 'Private Hire' && (
+            <Tabs defaultValue="basic" className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="basic">Basic Details</TabsTrigger>
+                <TabsTrigger value="hire">Hire Details</TabsTrigger>
+              </TabsList>
+              <TabsContent value="basic" className="mt-4">
+                <div className="text-sm text-muted-foreground">
+                  Complete the crew and expense details below.
+                </div>
+              </TabsContent>
+              <TabsContent value="hire" className="mt-4 space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="duration">Duration</Label>
+                    <Select 
+                      value={formData.hireDetails.duration} 
+                      onValueChange={(value) => updateHireDetails('duration', value as HireDetails['duration'])}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Full Day">Full Day</SelectItem>
+                        <SelectItem value="Half Day">Half Day</SelectItem>
+                        <SelectItem value="Night Fishing">Night Fishing</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <Label htmlFor="startTime">Start Time</Label>
+                      <Input
+                        id="startTime"
+                        type="time"
+                        value={formData.hireDetails.startTime}
+                        onChange={(e) => updateHireDetails('startTime', e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="endTime">End Time</Label>
+                      <Input
+                        id="endTime"
+                        type="time"
+                        value={formData.hireDetails.endTime}
+                        onChange={(e) => updateHireDetails('endTime', e.target.value)}
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="clientName">Client Name</Label>
+                    <Input
+                      id="clientName"
+                      placeholder="Client name"
+                      value={formData.hireDetails.clientName}
+                      onChange={(e) => updateHireDetails('clientName', e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="clientContact">Client Contact</Label>
+                    <Input
+                      id="clientContact"
+                      placeholder="Phone/Contact"
+                      value={formData.hireDetails.clientContact}
+                      onChange={(e) => updateHireDetails('clientContact', e.target.value)}
+                    />
+                  </div>
+                </div>
+                <div>
+                  <Label htmlFor="specialRequests">Special Requests</Label>
+                  <Textarea
+                    id="specialRequests"
+                    placeholder="Any special requests or notes..."
+                    value={formData.hireDetails.specialRequests}
+                    onChange={(e) => updateHireDetails('specialRequests', e.target.value)}
+                    rows={3}
+                  />
+                </div>
+              </TabsContent>
+            </Tabs>
+          )}
         </CardContent>
       </Card>
 
@@ -304,6 +411,7 @@ export function TripForm({ onSubmit, onSaveBasic, initialData, isEditing = false
                 type="number"
                 step="0.01"
                 value={formData.expenses.fuel}
+                onFocus={handleNumberFocus}
                 onChange={(e) => updateExpense('fuel', parseFloat(e.target.value) || 0)}
                 required
               />
@@ -315,6 +423,7 @@ export function TripForm({ onSubmit, onSaveBasic, initialData, isEditing = false
                 type="number"
                 step="0.01"
                 value={formData.expenses.food}
+                onFocus={handleNumberFocus}
                 onChange={(e) => updateExpense('food', parseFloat(e.target.value) || 0)}
                 required
               />
@@ -326,6 +435,7 @@ export function TripForm({ onSubmit, onSaveBasic, initialData, isEditing = false
                 type="number"
                 step="0.01"
                 value={formData.expenses.other}
+                onFocus={handleNumberFocus}
                 onChange={(e) => updateExpense('other', parseFloat(e.target.value) || 0)}
                 required
               />
@@ -379,6 +489,7 @@ export function TripForm({ onSubmit, onSaveBasic, initialData, isEditing = false
                 type="number"
                 step="0.1"
                 value={newFishSale.weight || ''}
+                onFocus={handleNumberFocus}
                 onChange={(e) => setNewFishSale(prev => ({ ...prev, weight: parseFloat(e.target.value) || 0 }))}
               />
             </div>
@@ -389,6 +500,7 @@ export function TripForm({ onSubmit, onSaveBasic, initialData, isEditing = false
                 type="number"
                 step="0.01"
                 value={newFishSale.ratePrice || ''}
+                onFocus={handleNumberFocus}
                 onChange={(e) => setNewFishSale(prev => ({ ...prev, ratePrice: parseFloat(e.target.value) || 0 }))}
               />
             </div>
@@ -493,6 +605,7 @@ export function TripForm({ onSubmit, onSaveBasic, initialData, isEditing = false
                 type="number"
                 step="0.1"
                 value={formData.totalCatch}
+                onFocus={handleNumberFocus}
                 onChange={(e) => setFormData(prev => ({ ...prev, totalCatch: parseFloat(e.target.value) || 0 }))}
                 required
               />
@@ -504,6 +617,7 @@ export function TripForm({ onSubmit, onSaveBasic, initialData, isEditing = false
                 type="number"
                 step="0.01"
                 value={formData.totalSales}
+                onFocus={handleNumberFocus}
                 onChange={(e) => setFormData(prev => ({ ...prev, totalSales: parseFloat(e.target.value) || 0 }))}
                 required
               />
@@ -525,6 +639,7 @@ export function TripForm({ onSubmit, onSaveBasic, initialData, isEditing = false
               min="0"
               max="100"
               value={formData.ownerSharePercent}
+              onFocus={handleNumberFocus}
               onChange={(e) => setFormData(prev => ({ ...prev, ownerSharePercent: parseFloat(e.target.value) || 0 }))}
             />
           </div>
