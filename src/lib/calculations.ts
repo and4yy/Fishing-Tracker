@@ -2,10 +2,12 @@ import { Expense } from '@/types/fishing';
 
 export const calculateProfit = (
   totalSales: number,
-  expenses: Expense
+  expenses: Expense,
+  hirePrice: number = 0
 ): number => {
   const totalExpenses = expenses.fuel + expenses.food + expenses.other;
-  return totalSales - totalExpenses;
+  const totalRevenue = totalSales + hirePrice;
+  return totalRevenue - totalExpenses;
 };
 
 export const calculateProfitDistribution = (

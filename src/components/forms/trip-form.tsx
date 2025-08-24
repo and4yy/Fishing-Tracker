@@ -215,7 +215,8 @@ export function TripForm({ onSubmit, onSaveBasic, initialData, isEditing = false
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    const profit = calculateProfit(formData.totalSales, formData.expenses);
+    const hirePrice = formData.tripType === 'Private Hire' ? (formData.hireDetails.hiredPrice || 0) : 0;
+    const profit = calculateProfit(formData.totalSales, formData.expenses, hirePrice);
     const crewMembers = formData.crew.filter(member => member.trim() !== '');
     const distribution = calculateProfitDistribution(profit, crewMembers.length, formData.ownerSharePercent);
 
@@ -238,7 +239,8 @@ export function TripForm({ onSubmit, onSaveBasic, initialData, isEditing = false
     onSubmit(trip);
   };
 
-  const profit = calculateProfit(formData.totalSales, formData.expenses);
+  const hirePrice = formData.tripType === 'Private Hire' ? (formData.hireDetails.hiredPrice || 0) : 0;
+  const profit = calculateProfit(formData.totalSales, formData.expenses, hirePrice);
   const crewCount = formData.crew.filter(member => member.trim() !== '').length;
   const distribution = calculateProfitDistribution(profit, crewCount, formData.ownerSharePercent);
 
@@ -636,10 +638,20 @@ export function TripForm({ onSubmit, onSaveBasic, initialData, isEditing = false
           </div>
           
           <div className="bg-muted p-4 rounded-lg space-y-2">
-            <div className="text-sm font-medium">Profit Calculation:</div>
-            <div className="text-sm">Total Profit: MVR {profit.toFixed(2)}</div>
-            <div className="text-sm">Owner Profit: MVR {distribution.ownerProfit.toFixed(2)}</div>
-            <div className="text-sm">Profit per Crew ({crewCount} members): MVR {distribution.profitPerCrew.toFixed(2)}</div>
+            <div className="text-sm font-medium">Revenue & Profit Calculation:</div>
+            {formData.tripType === 'Private Hire' && hirePrice > 0 && (
+              <div className="text-sm">Hire Price: MVR {hirePrice.toFixed(2)}</div>
+            )}
+            {formData.totalSales > 0 && (
+              <div className="text-sm">Fish Sales: MVR {formData.totalSales.toFixed(2)}</div>
+            )}
+            <div className="text-sm">Total Revenue: MVR {(formData.totalSales + hirePrice).toFixed(2)}</div>
+            <div className="text-sm">Total Expenses: MVR {(formData.expenses.fuel + formData.expenses.food + formData.expenses.other).toFixed(2)}</div>
+            <div className="text-sm font-medium">Net Profit: MVR {profit.toFixed(2)}</div>
+            <div className="border-t pt-2 mt-2">
+              <div className="text-sm">Owner Profit ({formData.ownerSharePercent}%): MVR {distribution.ownerProfit.toFixed(2)}</div>
+              <div className="text-sm">Profit per Crew ({crewCount} members): MVR {distribution.profitPerCrew.toFixed(2)}</div>
+            </div>
           </div>
         </CardContent>
       </Card>
