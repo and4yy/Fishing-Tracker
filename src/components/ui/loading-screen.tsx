@@ -13,7 +13,7 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({ isLoading, childre
       <div className="flex flex-col items-center space-y-8 animate-fade-in">
         <div className="relative">
           <img 
-            src="/lovable-uploads/f4de85e3-f4f4-43d6-8017-db15188787eb.png" 
+            src="/lovable-uploads/e436db51-c5e4-46bb-a5b3-c33ec4e0721a.png" 
             alt="Fishing Reel"
             className="w-32 h-32 animate-spin animate-scale-in"
             style={{ animationDuration: '3s' }}
