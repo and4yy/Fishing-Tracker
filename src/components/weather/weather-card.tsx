@@ -2,11 +2,11 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { WeatherService, WeatherData, WeatherForecast } from '@/lib/weather';
 import { Cloud, Wind, Eye, Gauge, Droplets, MapPin, RefreshCw, Calendar, Thermometer, CloudRain, Sun, Compass } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { WeatherDetailModal } from './weather-detail-modal';
 
 interface WeatherCardProps {
   onWeatherData?: (weather: WeatherData | null) => void;
@@ -23,6 +23,7 @@ export function WeatherCard({ onWeatherData, selectedDate }: WeatherCardProps) {
   const { toast } = useToast();
 
   const fetchWeatherData = async (lat: number, lng: number) => {
+    console.log('Fetching weather data for coordinates:', lat, lng);
     setLoading(true);
     setError(null);
     
@@ -32,6 +33,7 @@ export function WeatherCard({ onWeatherData, selectedDate }: WeatherCardProps) {
         WeatherService.getForecast(lat, lng, 5)
       ]);
       
+      console.log('Weather data fetched successfully:', { current, forecastData });
       setWeatherData(current);
       setForecast(forecastData);
       onWeatherData?.(current);
@@ -40,6 +42,7 @@ export function WeatherCard({ onWeatherData, selectedDate }: WeatherCardProps) {
       setLocation(locationName);
       
     } catch (err) {
+      console.error('Weather fetch error:', err);
       setError('Failed to fetch weather data');
       toast({
         title: "Weather Error",
@@ -255,15 +258,19 @@ export function WeatherCard({ onWeatherData, selectedDate }: WeatherCardProps) {
           
           <TabsContent value="forecast" className="mt-4">
             <div className="space-y-3">
-              {forecast.slice(0, 5).map((day, index) => {
-                const WeatherIcon = getWeatherIcon(day.weatherCode);
-                const fishingCondition = getFishingConditions(day);
-                
-                console.log('Rendering forecast day:', day.date, 'with conditions:', fishingCondition);
-                
-                return (
-                  <Dialog key={day.date}>
-                    <DialogTrigger asChild>
+              {forecast.length === 0 ? (
+                <div className="text-center py-4 text-muted-foreground">
+                  No forecast data available
+                </div>
+              ) : (
+                forecast.slice(0, 5).map((day, index) => {
+                  const WeatherIcon = getWeatherIcon(day.weatherCode);
+                  const fishingCondition = getFishingConditions(day);
+                  
+                  console.log('Rendering forecast day:', day.date, index);
+                  
+                  return (
+                    <WeatherDetailModal key={day.date} forecast={day} index={index}>
                       <button 
                         className={`w-full flex items-center justify-between p-3 rounded-lg border cursor-pointer transition-colors hover:bg-accent/70 ${
                           day.date === selectedDate 
@@ -271,8 +278,7 @@ export function WeatherCard({ onWeatherData, selectedDate }: WeatherCardProps) {
                             : 'bg-card hover:bg-accent/50'
                         }`}
                         onClick={() => {
-                          console.log('Forecast clicked:', day.date);
-                          setSelectedForecastDay(day);
+                          console.log('Weather forecast clicked:', day.date);
                         }}
                       >
                         <div className="flex items-center gap-3 flex-1">
@@ -299,83 +305,10 @@ export function WeatherCard({ onWeatherData, selectedDate }: WeatherCardProps) {
                           </div>
                         </div>
                       </button>
-                    </DialogTrigger>
-                    
-                    <DialogContent className="max-w-md">
-                      <DialogHeader>
-                        <DialogTitle className="flex items-center gap-2">
-                          <WeatherIcon className="h-5 w-5" />
-                          {index === 0 ? 'Today\'s Weather' : new Date(day.date).toLocaleDateString('en', { 
-                            weekday: 'long', 
-                            year: 'numeric', 
-                            month: 'long', 
-                            day: 'numeric' 
-                          })}
-                        </DialogTitle>
-                      </DialogHeader>
-                      
-                      <div className="space-y-6">
-                        {/* Temperature Overview */}
-                        <div className="text-center p-4 bg-gradient-to-br from-sky-50 to-blue-50 dark:from-sky-950/30 dark:to-blue-950/30 rounded-lg">
-                          <div className="flex justify-center items-center gap-4">
-                            <div className="text-center">
-                              <div className="text-2xl font-bold text-primary">{day.maxTemp}°C</div>
-                              <div className="text-xs text-muted-foreground">High</div>
-                            </div>
-                            <div className="h-8 w-px bg-border"></div>
-                            <div className="text-center">
-                              <div className="text-2xl font-bold text-blue-600">{day.minTemp}°C</div>
-                              <div className="text-xs text-muted-foreground">Low</div>
-                            </div>
-                          </div>
-                          <div className="text-sm text-muted-foreground mt-2 capitalize">{day.description}</div>
-                        </div>
-                        
-                        {/* Weather Details */}
-                        <div className="grid grid-cols-2 gap-4">
-                          <div className="flex items-center gap-3 p-3 rounded-lg bg-accent/20">
-                            <Wind className="h-5 w-5 text-blue-500" />
-                            <div>
-                              <div className="font-medium">{day.windSpeed} m/s</div>
-                              <div className="text-xs text-muted-foreground">Wind Speed</div>
-                            </div>
-                          </div>
-                          
-                          <div className="flex items-center gap-3 p-3 rounded-lg bg-accent/20">
-                            <CloudRain className="h-5 w-5 text-blue-500" />
-                            <div>
-                              <div className="font-medium">{day.precipitation}mm</div>
-                              <div className="text-xs text-muted-foreground">Precipitation</div>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        {/* Fishing Conditions */}
-                        <div className="p-4 rounded-lg border-l-4 border-l-primary bg-primary/5">
-                          <div className="flex items-center justify-between mb-2">
-                            <h4 className="font-medium">Fishing Conditions</h4>
-                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                              fishingCondition.condition === 'Good' ? 'bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-300' :
-                              fishingCondition.condition === 'Fair' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-950 dark:text-yellow-300' :
-                              'bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300'
-                            }`}>
-                              {fishingCondition.condition}
-                            </span>
-                          </div>
-                          <p className="text-sm text-muted-foreground">{fishingCondition.description}</p>
-                          {fishingCondition.condition === 'Good' && (
-                            <div className="mt-2 text-xs text-green-600 dark:text-green-400">
-                              • Ideal for offshore fishing<br/>
-                              • Calm seas expected<br/>
-                              • Good visibility
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </DialogContent>
-                  </Dialog>
-                );
-              })}
+                    </WeatherDetailModal>
+                  );
+                })
+              )}
             </div>
           </TabsContent>
         </Tabs>
