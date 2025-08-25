@@ -39,7 +39,7 @@ export function TripForm({ onSubmit, onSaveBasic, initialData, isEditing = false
     },
     totalCatch: initialData?.totalCatch || 0,
     totalSales: initialData?.totalSales || 0,
-    ownerSharePercent: initialData?.ownerSharePercent || 0,
+    ownerSharePercent: initialData?.ownerSharePercent || 50,
     fishSales: initialData?.fishSales || [] as FishSale[],
   });
 
