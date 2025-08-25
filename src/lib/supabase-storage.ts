@@ -43,28 +43,32 @@ export class SupabaseStorageService {
   // Get all trips for the authenticated user
   static async getAllTrips(): Promise<FishingTrip[]> {
     try {
+      console.log('SupabaseStorageService: Starting getAllTrips()');
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
-        // Return local storage data if not authenticated
+        console.log('SupabaseStorageService: No user authenticated, using local storage');
         return StorageService.getAllTrips();
       }
 
+      console.log('SupabaseStorageService: User authenticated, fetching from Supabase');
       const { data, error } = await supabase
         .from('fishing_trips')
         .select('*')
         .order('date', { ascending: false });
 
       if (error) {
-        console.error('Error fetching trips from Supabase:', error);
-        // Fallback to local storage
+        console.error('SupabaseStorageService: Error fetching trips from Supabase:', error);
+        console.log('SupabaseStorageService: Falling back to local storage');
         return StorageService.getAllTrips();
       }
 
+      console.log('SupabaseStorageService: Successfully fetched', data?.length || 0, 'trips from Supabase');
       // Transform Supabase data to match our interface
       return data.map(this.transformFromSupabase);
     } catch (error) {
-      console.error('Error in getAllTrips:', error);
+      console.error('SupabaseStorageService: Error in getAllTrips:', error);
+      console.log('SupabaseStorageService: Falling back to local storage after error');
       return StorageService.getAllTrips();
     }
   }
