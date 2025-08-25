@@ -7,12 +7,40 @@ import { Textarea } from "@/components/ui/textarea";
 import { BoatSettings } from "@/types/settings";
 import { useToast } from "@/hooks/use-toast";
 import { Save, Upload, X } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 const SETTINGS_KEY = 'boat-settings';
 
 export const BoatSettingsService = {
-  getSettings(): BoatSettings {
+  async getSettings(): Promise<BoatSettings> {
     try {
+      // Try to get settings from Supabase first
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (user) {
+        const { data, error } = await supabase
+          .from('user_settings')
+          .select('*')
+          .eq('user_id', user.id)
+          .single();
+        
+        if (!error && data) {
+          return {
+            boatName: data.boat_name || '',
+            ownerName: data.owner_name || '',
+            contactNumber: data.contact_number || '',
+            email: data.email || '',
+            address: data.address || '',
+            registrationNumber: data.registration_number || '',
+            logoUrl: data.logo_url || '',
+            bankName: data.bank_name || '',
+            accountNumber: data.account_number || '',
+            accountName: data.account_name || ''
+          };
+        }
+      }
+      
+      // Fallback to localStorage
       const data = localStorage.getItem(SETTINGS_KEY);
       return data ? JSON.parse(data) : {
         boatName: '',
@@ -28,7 +56,9 @@ export const BoatSettingsService = {
       };
     } catch (error) {
       console.error('Error loading boat settings:', error);
-      return {
+      // Fallback to localStorage on error
+      const data = localStorage.getItem(SETTINGS_KEY);
+      return data ? JSON.parse(data) : {
         boatName: '',
         ownerName: '',
         contactNumber: '',
@@ -43,12 +73,68 @@ export const BoatSettingsService = {
     }
   },
 
-  saveSettings(settings: BoatSettings): void {
+  async saveSettings(settings: BoatSettings): Promise<void> {
     try {
+      // Save to localStorage first as backup
       localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+      
+      // Try to save to Supabase if user is authenticated
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (user) {
+        const settingsData = {
+          user_id: user.id,
+          boat_name: settings.boatName,
+          owner_name: settings.ownerName,
+          contact_number: settings.contactNumber,
+          email: settings.email,
+          address: settings.address,
+          registration_number: settings.registrationNumber,
+          logo_url: settings.logoUrl,
+          bank_name: settings.bankName,
+          account_number: settings.accountNumber,
+          account_name: settings.accountName
+        };
+        
+        const { error } = await supabase
+          .from('user_settings')
+          .upsert(settingsData);
+        
+        if (error) {
+          console.error('Error saving to Supabase:', error);
+          // Continue with localStorage save as fallback
+        }
+      }
     } catch (error) {
       console.error('Error saving boat settings:', error);
       throw new Error('Failed to save boat settings');
+    }
+  },
+
+  async syncLocalDataToSupabase(): Promise<void> {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      // Get local settings
+      const localData = localStorage.getItem(SETTINGS_KEY);
+      if (!localData) return;
+
+      const settings = JSON.parse(localData);
+      
+      // Check if Supabase has settings
+      const { data: existingData } = await supabase
+        .from('user_settings')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+
+      // Only sync if no Supabase data exists
+      if (!existingData) {
+        await this.saveSettings(settings);
+      }
+    } catch (error) {
+      console.error('Error syncing local data to Supabase:', error);
     }
   }
 };
@@ -74,13 +160,16 @@ export function BoatSettingsForm({ onSave, onClose }: BoatSettingsFormProps) {
   });
 
   useEffect(() => {
-    const savedSettings = BoatSettingsService.getSettings();
-    setSettings(savedSettings);
+    const loadSettings = async () => {
+      const savedSettings = await BoatSettingsService.getSettings();
+      setSettings(savedSettings);
+    };
+    loadSettings();
   }, []);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     try {
-      BoatSettingsService.saveSettings(settings);
+      await BoatSettingsService.saveSettings(settings);
       toast({
         title: "Settings saved",
         description: "Your boat details have been saved successfully."

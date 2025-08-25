@@ -107,6 +107,57 @@ export type Database = {
         }
         Relationships: []
       }
+      user_settings: {
+        Row: {
+          account_name: string | null
+          account_number: string | null
+          address: string | null
+          bank_name: string | null
+          boat_name: string | null
+          contact_number: string | null
+          created_at: string
+          email: string | null
+          id: string
+          logo_url: string | null
+          owner_name: string | null
+          registration_number: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          account_name?: string | null
+          account_number?: string | null
+          address?: string | null
+          bank_name?: string | null
+          boat_name?: string | null
+          contact_number?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          logo_url?: string | null
+          owner_name?: string | null
+          registration_number?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          account_name?: string | null
+          account_number?: string | null
+          address?: string | null
+          bank_name?: string | null
+          boat_name?: string | null
+          contact_number?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          logo_url?: string | null
+          owner_name?: string | null
+          registration_number?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

@@ -128,7 +128,7 @@ export function TripForm({ onSubmit, onSaveBasic, initialData, isEditing = false
 
   const generateInvoice = async (fishSale: FishSale, action: 'download' | 'print') => {
     try {
-      const boatSettings = BoatSettingsService.getSettings();
+      const boatSettings = await BoatSettingsService.getSettings();
       
       if (!boatSettings.boatName || !boatSettings.ownerName) {
         toast({

@@ -40,7 +40,7 @@ export default function Dashboard() {
       const summaryData = await SupabaseStorageService.getSummary();
       setSummary(summaryData);
       
-      const settings = BoatSettingsService.getSettings();
+      const settings = await BoatSettingsService.getSettings();
       setBoatSettings(settings);
 
       // Calculate crew payouts from trip history

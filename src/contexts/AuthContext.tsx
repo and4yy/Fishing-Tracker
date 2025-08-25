@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { SupabaseStorageService } from '@/lib/supabase-storage';
+import { BoatSettingsService } from '@/components/settings/boat-settings';
 
 interface AuthContextType {
   user: User | null;
@@ -49,6 +50,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               console.log('Local data synced to Supabase successfully');
             }).catch(error => {
               console.error('Failed to sync local data:', error);
+            });
+            
+            BoatSettingsService.syncLocalDataToSupabase().then(() => {
+              console.log('Boat settings synced to Supabase successfully');
+            }).catch(error => {
+              console.error('Failed to sync boat settings:', error);
             });
           }, 0);
         }
