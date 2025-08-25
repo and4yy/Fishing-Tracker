@@ -39,8 +39,6 @@ export const generateInvoicePDF = (invoiceData: InvoiceData): string => {
     <meta charset="UTF-8">
     <title>Invoice ${invoiceNumber}</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-        
         * {
             margin: 0;
             padding: 0;
@@ -49,21 +47,24 @@ export const generateInvoicePDF = (invoiceData: InvoiceData): string => {
         
         @page {
             size: A4;
-            margin: 10mm 15mm;
+            margin: 0.5in 0.75in;
         }
         
         body {
-            font-family: 'Inter', Arial, sans-serif;
-            font-size: 13px;
-            line-height: 1.3;
-            color: #333;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 11pt;
+            line-height: 1.4;
+            color: #000;
             background: white;
-            max-width: 180mm;
-            margin: 0 auto;
+            max-width: 100%;
+            margin: 0;
+            padding: 0.5in 0.75in;
         }
         
         .invoice-container {
             background: white;
+            max-width: 7.5in;
+            margin: 0 auto;
             padding: 0;
         }
         
@@ -71,21 +72,42 @@ export const generateInvoicePDF = (invoiceData: InvoiceData): string => {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 25px;
-            padding-bottom: 12px;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #000;
+        }
+        
+        .company-section {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+        }
+        
+        .logo-container {
+            width: 80px;
+            height: 60px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 9pt;
+            color: #666;
+            flex-shrink: 0;
         }
         
         .company-info h1 {
-            font-size: 16px;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 3px;
+            font-size: 18pt;
+            font-weight: bold;
+            color: #000;
+            margin-bottom: 8px;
+            line-height: 1.2;
         }
         
         .company-details {
-            font-size: 11px;
-            color: #666;
-            line-height: 1.2;
+            font-size: 10pt;
+            color: #000;
+            line-height: 1.3;
         }
         
         .invoice-title {
@@ -93,107 +115,113 @@ export const generateInvoicePDF = (invoiceData: InvoiceData): string => {
         }
         
         .invoice-title h2 {
-            font-size: 28px;
-            font-weight: 700;
-            color: #333;
-            letter-spacing: 1px;
-            margin-bottom: 8px;
-        }
-        
-        .logo-container {
-            width: 70px;
-            height: 50px;
-            border: 2px dashed #ddd;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 10px;
-            color: #666;
-            margin-bottom: 8px;
+            font-size: 32pt;
+            font-weight: bold;
+            color: #000;
+            margin: 0;
+            letter-spacing: 2px;
         }
         
         .invoice-details {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 25px;
-            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 40px;
+            gap: 40px;
+        }
+        
+        .bill-to,
+        .invoice-meta {
+            flex: 1;
         }
         
         .bill-to h3,
         .invoice-meta h3 {
-            font-size: 13px;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 8px;
+            font-size: 12pt;
+            font-weight: bold;
+            color: #000;
+            margin-bottom: 12px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
         }
         
         .bill-to-details {
-            font-size: 12px;
-            color: #333;
-            line-height: 1.3;
+            font-size: 11pt;
+            color: #000;
+            line-height: 1.4;
+        }
+        
+        .bill-to-details strong {
+            font-weight: bold;
         }
         
         .invoice-meta-table {
             width: 100%;
+            border-collapse: collapse;
         }
         
         .invoice-meta-table td {
-            padding: 3px 0;
-            font-size: 12px;
+            padding: 4px 0;
+            font-size: 11pt;
+            vertical-align: top;
         }
         
         .invoice-meta-table .label {
-            font-weight: 600;
-            color: #333;
-            width: 90px;
+            font-weight: bold;
+            color: #000;
+            width: 100px;
+            padding-right: 15px;
         }
         
         .invoice-meta-table .value {
-            color: #333;
+            color: #000;
+        }
+        
+        .items-section {
+            margin-bottom: 30px;
         }
         
         .items-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 15px;
-        }
-        
-        .items-table thead {
-            background-color: #4a5568;
-            color: white;
+            margin-bottom: 20px;
         }
         
         .items-table th {
-            padding: 10px 8px;
+            background-color: #f8f9fa;
+            border: 1px solid #000;
+            padding: 12px 8px;
             text-align: left;
-            font-weight: 600;
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            font-weight: bold;
+            font-size: 11pt;
+            color: #000;
         }
         
-        .items-table th:last-child {
+        .items-table th:nth-child(1) { width: 15%; }
+        .items-table th:nth-child(2) { width: 45%; }
+        .items-table th:nth-child(3) { width: 20%; }
+        .items-table th:nth-child(4) { width: 20%; text-align: right; }
+        
+        .items-table td {
+            border: 1px solid #000;
+            padding: 12px 8px;
+            font-size: 11pt;
+            color: #000;
+            vertical-align: top;
+        }
+        
+        .items-table td:last-child {
             text-align: right;
+            font-weight: bold;
         }
         
-        .items-table tbody td {
-            padding: 10px 8px;
-            border-bottom: 1px solid #e2e8f0;
-            font-size: 12px;
-        }
-        
-        .items-table tbody td:last-child {
-            text-align: right;
-            font-weight: 600;
+        .totals-section {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 40px;
         }
         
         .totals {
-            margin-left: auto;
-            width: 280px;
-            margin-bottom: 25px;
+            width: 300px;
         }
         
         .totals table {
@@ -202,76 +230,105 @@ export const generateInvoicePDF = (invoiceData: InvoiceData): string => {
         }
         
         .totals td {
-            padding: 5px 0;
-            font-size: 12px;
+            padding: 8px 0;
+            font-size: 11pt;
+            border-bottom: 1px solid #ddd;
         }
         
         .totals .label {
             text-align: right;
-            padding-right: 15px;
-            font-weight: 500;
+            padding-right: 20px;
+            font-weight: normal;
+            color: #000;
         }
         
         .totals .value {
             text-align: right;
-            font-weight: 600;
+            font-weight: bold;
+            color: #000;
+            width: 120px;
         }
         
-        .total-line {
-            border-top: 2px solid #333;
-        }
-        
-        .total-line .label,
-        .total-line .value {
-            font-size: 14px;
-            font-weight: 700;
-            padding-top: 8px;
-        }
-        
-        .footer {
-            margin-top: 30px;
-            padding-top: 15px;
-            border-top: 1px solid #e2e8f0;
-        }
-        
-        .terms h4 {
-            font-size: 12px;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 6px;
-        }
-        
-        .terms p {
-            font-size: 11px;
-            color: #666;
-            line-height: 1.3;
-            margin-bottom: 3px;
+        .total-line td {
+            border-bottom: none;
+            border-top: 2px solid #000;
+            padding-top: 12px;
+            font-size: 12pt;
+            font-weight: bold;
         }
         
         .payment-info {
-            margin-bottom: 15px;
+            margin-bottom: 30px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
         }
         
         .payment-info h4 {
-            font-size: 12px;
-            font-weight: 600;
-            margin-bottom: 6px;
+            font-size: 12pt;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #000;
         }
         
         .payment-info div {
-            font-size: 11px;
-            color: #666;
-            line-height: 1.3;
+            font-size: 10pt;
+            color: #000;
+            line-height: 1.4;
+        }
+        
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #ccc;
+        }
+        
+        .terms h4 {
+            font-size: 12pt;
+            font-weight: bold;
+            color: #000;
+            margin-bottom: 8px;
+        }
+        
+        .terms p {
+            font-size: 10pt;
+            color: #000;
+            line-height: 1.4;
+            margin-bottom: 4px;
         }
         
         @media print {
             body {
+                margin: 0;
+                padding: 0.5in 0.75in;
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
             }
             
             .invoice-container {
                 page-break-inside: avoid;
+                box-shadow: none;
+            }
+            
+            .header {
+                page-break-after: avoid;
+            }
+            
+            .items-table {
+                page-break-inside: avoid;
+            }
+        }
+        
+        @media screen {
+            body {
+                background: #f5f5f5;
+                padding: 20px;
+            }
+            
+            .invoice-container {
+                background: white;
+                box-shadow: 0 0 10px rgba(0,0,0,0.1);
+                padding: 0.5in 0.75in;
             }
         }
     </style>
@@ -328,36 +385,40 @@ export const generateInvoicePDF = (invoiceData: InvoiceData): string => {
             </div>
         </div>
 
-        <table class="items-table">
-            <thead>
-                <tr>
-                    <th>QTY</th>
-                    <th>Description</th>
-                    <th>Unit Price</th>
-                    <th>Amount</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>${fishSale.weight} kg</td>
-                    <td>Fresh Fish Catch (${tripType})</td>
-                    <td>MVR ${fishSale.ratePrice.toFixed(2)}</td>
-                    <td>MVR ${fishSale.totalAmount.toFixed(2)}</td>
-                </tr>
-            </tbody>
-        </table>
-
-        <div class="totals">
-            <table>
-                <tr>
-                    <td class="label">Subtotal</td>
-                    <td class="value">MVR ${fishSale.totalAmount.toFixed(2)}</td>
-                </tr>
-                <tr class="total-line">
-                    <td class="label">Total (MVR)</td>
-                    <td class="value">MVR ${fishSale.totalAmount.toFixed(2)}</td>
-                </tr>
+        <div class="items-section">
+            <table class="items-table">
+                <thead>
+                    <tr>
+                        <th>QTY</th>
+                        <th>Description</th>
+                        <th>Unit Price</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>${fishSale.weight} kg</td>
+                        <td>Fresh Fish Catch (${tripType})</td>
+                        <td>MVR ${fishSale.ratePrice.toFixed(2)}</td>
+                        <td>MVR ${fishSale.totalAmount.toFixed(2)}</td>
+                    </tr>
+                </tbody>
             </table>
+        </div>
+
+        <div class="totals-section">
+            <div class="totals">
+                <table>
+                    <tr>
+                        <td class="label">Subtotal:</td>
+                        <td class="value">MVR ${fishSale.totalAmount.toFixed(2)}</td>
+                    </tr>
+                    <tr class="total-line">
+                        <td class="label">Total (MVR):</td>
+                        <td class="value">MVR ${fishSale.totalAmount.toFixed(2)}</td>
+                    </tr>
+                </table>
+            </div>
         </div>
 
         ${boat.bankName ? `
