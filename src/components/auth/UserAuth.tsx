@@ -173,7 +173,7 @@ export function UserAuth() {
                 const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
                 window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
               }}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 bg-[#25D366] hover:bg-[#20c55a] text-white border-[#25D366] hover:border-[#20c55a]"
             >
               <MessageCircle className="h-4 w-4" />
               Contact via WhatsApp
