@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { User, LogOut, Mail, Lock, UserPlus, LogIn } from 'lucide-react';
+import { User, LogOut, Mail, Lock, UserPlus, LogIn, MessageCircle } from 'lucide-react';
 
 export function UserAuth() {
   const [email, setEmail] = useState('');
@@ -160,10 +160,19 @@ export function UserAuth() {
           </form>
           
           <div className="mt-6 p-4 bg-muted/50 rounded-lg border-l-4 border-primary">
-            <h4 className="font-medium mb-2 text-primary">Account Registration</h4>
-            <p className="text-sm text-muted-foreground">
-              For online data save capability user have to sign up for an account. For registration contact <strong>+9697371611</strong> via WhatsApp. MVR 1000 (one thousand Maldivian rufiya) will be charged for registration. Thank you!
+            <h4 className="font-medium mb-3 text-primary">Account Registration</h4>
+            <p className="text-sm text-muted-foreground mb-4">
+              To enable online data saving, users are required to sign up for an account. For registration, please contact us via WhatsApp at <strong>+960 97371611</strong>. A one-time registration fee of MVR 1,000 (One Thousand Maldivian Rufiyaa) applies. Thank you for your understanding and support!
             </p>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => window.open('https://wa.me/96097371611?text=Hello%2C%20I%20would%20like%20to%20register%20for%20an%20account%20to%20enable%20online%20data%20saving.', '_blank')}
+              className="flex items-center gap-2"
+            >
+              <MessageCircle className="h-4 w-4" />
+              Contact via WhatsApp
+            </Button>
           </div>
         </div>
         
