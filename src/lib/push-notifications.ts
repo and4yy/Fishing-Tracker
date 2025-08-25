@@ -65,7 +65,7 @@ export class PushNotificationService {
         return false;
       }
 
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('push_subscriptions')
         .upsert({
           user_id: user.id,
@@ -101,7 +101,7 @@ export class PushNotificationService {
         // Remove from database
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
-          await supabase
+          await (supabase as any)
             .from('push_subscriptions')
             .delete()
             .eq('user_id', user.id);
