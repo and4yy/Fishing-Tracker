@@ -167,7 +167,12 @@ export function UserAuth() {
             <Button 
               variant="outline" 
               size="sm"
-              onClick={() => window.open('https://wa.me/9607371611?text=Hello%2C%20I%20would%20like%20to%20register%20for%20an%20account%20to%20enable%20online%20data%20saving.', '_blank')}
+              onClick={() => {
+                const phoneNumber = '9607371611';
+                const message = 'Hello, I would like to register for an account to enable online data saving.';
+                const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+                window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+              }}
               className="flex items-center gap-2"
             >
               <MessageCircle className="h-4 w-4" />
