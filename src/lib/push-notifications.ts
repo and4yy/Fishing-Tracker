@@ -1,6 +1,9 @@
 import { supabase } from "@/integrations/supabase/client";
 
 const VAPID_PUBLIC_KEY = "BH7zQr1o5G2v4K3-8JE5xM9LNxQrTpWdXf2nYvH8pC6Qw7E9tR5yU3iO1pA6sD7fG9hJ2kL4mN8qP0rT5vX7yZ1a";
+
+// Create a generic supabase client for untyped table access
+const genericSupabase = supabase as any;
 const urlBase64ToUint8Array = (base64String: string): Uint8Array => {
   const padding = '='.repeat((4 - base64String.length % 4) % 4);
   const base64 = (base64String + padding)
@@ -65,7 +68,7 @@ export class PushNotificationService {
         return false;
       }
 
-      const { error } = await (supabase as any)
+      const { error } = await genericSupabase
         .from('push_subscriptions')
         .upsert({
           user_id: user.id,
@@ -101,7 +104,7 @@ export class PushNotificationService {
         // Remove from database
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
-          await (supabase as any)
+          await genericSupabase
             .from('push_subscriptions')
             .delete()
             .eq('user_id', user.id);
