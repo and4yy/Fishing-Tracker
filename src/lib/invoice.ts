@@ -27,9 +27,8 @@ export const generateInvoiceNumber = (): string => {
 export const generateInvoicePDF = (invoiceData: InvoiceData): string => {
   const { invoiceNumber, date, customer, boat, fishSale, tripType } = invoiceData;
   
-  // Calculate due date (14 days from invoice date)
+  // Calculate due date (same as invoice date)
   const dueDate = new Date(date);
-  dueDate.setDate(dueDate.getDate() + 14);
   const formattedDueDate = dueDate.toLocaleDateString();
   
   const invoiceHTML = `
@@ -345,12 +344,9 @@ export const generateInvoicePDF = (invoiceData: InvoiceData): string => {
                 </div>
                 `}
                 <div class="company-info">
-                    <h1>${boat.boatName || 'Your Company Inc.'}</h1>
+                    <h1>${boat.boatName || 'Your Boat Name'}</h1>
                     <div class="company-details">
-                        ${boat.address || '1234 Company St,'}<br>
-                        ${boat.ownerName ? `Owner: ${boat.ownerName}` : 'Company Town, ST 12345'}<br>
-                        ${boat.contactNumber ? `Tel: ${boat.contactNumber}` : ''}<br>
-                        ${boat.email ? `Email: ${boat.email}` : ''}
+                        ${boat.contactNumber ? `Contact: ${boat.contactNumber}` : 'Contact: Your Contact Number'}
                     </div>
                 </div>
             </div>
@@ -435,8 +431,7 @@ export const generateInvoicePDF = (invoiceData: InvoiceData): string => {
         <div class="footer">
             <div class="terms">
                 <h4>Terms and Conditions</h4>
-                <p>Payment is due in 14 days</p>
-                <p>Please make checks payable to: ${boat.boatName || 'Your Company Inc.'}</p>
+                <p>Payment is due on invoice date</p>
             </div>
         </div>
     </div>
