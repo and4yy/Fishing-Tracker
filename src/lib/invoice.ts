@@ -73,7 +73,11 @@ export const generateInvoicePDF = (invoiceData: InvoiceData): string => {
             align-items: flex-start;
             margin-bottom: 40px;
             padding-bottom: 20px;
-            border-bottom: 2px solid #000;
+            border-bottom: 2px solid #2563eb;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
         }
         
         .company-section {
@@ -98,7 +102,7 @@ export const generateInvoicePDF = (invoiceData: InvoiceData): string => {
         .company-info h1 {
             font-size: 18pt;
             font-weight: bold;
-            color: #000;
+            color: #1e40af;
             margin-bottom: 8px;
             line-height: 1.2;
         }
@@ -116,7 +120,7 @@ export const generateInvoicePDF = (invoiceData: InvoiceData): string => {
         .invoice-title h2 {
             font-size: 32pt;
             font-weight: bold;
-            color: #000;
+            color: #1e40af;
             margin: 0;
             letter-spacing: 2px;
         }
@@ -137,7 +141,7 @@ export const generateInvoicePDF = (invoiceData: InvoiceData): string => {
         .invoice-meta h3 {
             font-size: 12pt;
             font-weight: bold;
-            color: #000;
+            color: #1e40af;
             margin-bottom: 12px;
             text-transform: uppercase;
             letter-spacing: 1px;
@@ -186,13 +190,13 @@ export const generateInvoicePDF = (invoiceData: InvoiceData): string => {
         }
         
         .items-table th {
-            background-color: #f8f9fa;
-            border: 1px solid #000;
+            background-color: #dbeafe;
+            border: 1px solid #3b82f6;
             padding: 12px 8px;
             text-align: left;
             font-weight: bold;
             font-size: 11pt;
-            color: #000;
+            color: #1e40af;
         }
         
         .items-table th:nth-child(1) { width: 15%; }
@@ -201,7 +205,7 @@ export const generateInvoicePDF = (invoiceData: InvoiceData): string => {
         .items-table th:nth-child(4) { width: 20%; text-align: right; }
         
         .items-table td {
-            border: 1px solid #000;
+            border: 1px solid #cbd5e1;
             padding: 12px 8px;
             font-size: 11pt;
             color: #000;
@@ -250,17 +254,19 @@ export const generateInvoicePDF = (invoiceData: InvoiceData): string => {
         
         .total-line td {
             border-bottom: none;
-            border-top: 2px solid #000;
+            border-top: 2px solid #2563eb;
             padding-top: 12px;
             font-size: 12pt;
             font-weight: bold;
+            background-color: #f1f5f9;
         }
         
         .payment-info {
             margin-bottom: 30px;
             padding: 15px;
-            background-color: #f8f9fa;
-            border: 1px solid #ddd;
+            background-color: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-radius: 6px;
         }
         
         .payment-info h4 {
@@ -279,13 +285,16 @@ export const generateInvoicePDF = (invoiceData: InvoiceData): string => {
         .footer {
             margin-top: 40px;
             padding-top: 20px;
-            border-top: 1px solid #ccc;
+            border-top: 1px solid #cbd5e1;
+            background-color: #f8fafc;
+            padding: 20px;
+            border-radius: 6px;
         }
         
         .terms h4 {
             font-size: 12pt;
             font-weight: bold;
-            color: #000;
+            color: #1e40af;
             margin-bottom: 8px;
         }
         
@@ -431,7 +440,9 @@ export const generateInvoicePDF = (invoiceData: InvoiceData): string => {
         <div class="footer">
             <div class="terms">
                 <h4>Terms and Conditions</h4>
-                <p>Payment is due on invoice date</p>
+                <p>Payment is due on receipt, unless otherwise agreed.</p>
+                <p>Please check the invoice details carefully.</p>
+                <p>Any discrepancies must be reported immediately.</p>
             </div>
         </div>
     </div>
