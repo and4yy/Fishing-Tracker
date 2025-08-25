@@ -63,6 +63,30 @@ export function UserAuth() {
     setLoading(false);
   };
 
+  const handleWhatsAppContact = () => {
+    const phoneNumber = '9607371611';
+    const message = 'Hello, I would like to register for an account to enable online data saving.';
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+    
+    try {
+      window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+    } catch (error) {
+      // Fallback: copy phone number to clipboard
+      navigator.clipboard.writeText(`+960 ${phoneNumber}`).then(() => {
+        toast({
+          title: 'Phone number copied!',
+          description: 'WhatsApp link blocked. Phone number copied to clipboard: +960 7371611'
+        });
+      }).catch(() => {
+        toast({
+          title: 'Contact Information',
+          description: 'Please contact us at +960 7371611 via WhatsApp for registration.',
+          variant: 'default'
+        });
+      });
+    }
+  };
+
   const handleSignOut = async () => {
     const { error } = await signOut();
     if (error) {
@@ -167,12 +191,7 @@ export function UserAuth() {
             <Button 
               variant="outline" 
               size="sm"
-              onClick={() => {
-                const phoneNumber = '9607371611';
-                const message = 'Hello, I would like to register for an account to enable online data saving.';
-                const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
-                window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
-              }}
+              onClick={handleWhatsAppContact}
               className="flex items-center gap-2 bg-[#25D366] hover:bg-[#20c55a] text-white border-[#25D366] hover:border-[#20c55a]"
             >
               <MessageCircle className="h-4 w-4" />
