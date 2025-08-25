@@ -2,6 +2,41 @@ import { FishingTrip, TripSummary } from '@/types/fishing';
 import { supabase } from '@/integrations/supabase/client';
 import { StorageService } from './storage';
 import { useToast } from '@/hooks/use-toast';
+import { generateSupabaseUUID } from './calculations';
+
+// Map to store local ID to Supabase UUID mappings
+const ID_MAPPING_KEY = 'trip-id-mappings';
+
+class IdMappingService {
+  static getMapping(): Record<string, string> {
+    try {
+      const data = localStorage.getItem(ID_MAPPING_KEY);
+      return data ? JSON.parse(data) : {};
+    } catch {
+      return {};
+    }
+  }
+
+  static saveMapping(localId: string, supabaseId: string): void {
+    try {
+      const mappings = this.getMapping();
+      mappings[localId] = supabaseId;
+      localStorage.setItem(ID_MAPPING_KEY, JSON.stringify(mappings));
+    } catch (error) {
+      console.error('Error saving ID mapping:', error);
+    }
+  }
+
+  static getSupabaseId(localId: string): string {
+    const mappings = this.getMapping();
+    return mappings[localId] || generateSupabaseUUID();
+  }
+
+  static getLocalId(supabaseId: string): string | null {
+    const mappings = this.getMapping();
+    return Object.keys(mappings).find(key => mappings[key] === supabaseId) || null;
+  }
+}
 
 export class SupabaseStorageService {
   
@@ -81,10 +116,13 @@ export class SupabaseStorageService {
         return;
       }
 
+      // Get the Supabase UUID for this local ID
+      const supabaseId = IdMappingService.getSupabaseId(id);
+
       const { error } = await supabase
         .from('fishing_trips')
         .delete()
-        .eq('id', id);
+        .eq('id', supabaseId);
 
       if (error) {
         console.error('Error deleting trip from Supabase:', error);
@@ -108,10 +146,13 @@ export class SupabaseStorageService {
         return StorageService.getTripById(id);
       }
 
+      // Get the Supabase UUID for this local ID
+      const supabaseId = IdMappingService.getSupabaseId(id);
+
       const { data, error } = await supabase
         .from('fishing_trips')
         .select('*')
-        .eq('id', id)
+        .eq('id', supabaseId)
         .maybeSingle();
 
       if (error) {
@@ -204,8 +245,11 @@ export class SupabaseStorageService {
 
   // Transform from Supabase format to our interface
   private static transformFromSupabase(data: any): FishingTrip {
+    // Try to get the original local ID from the mapping, otherwise use the Supabase UUID
+    const localId = IdMappingService.getLocalId(data.id) || data.id;
+    
     return {
-      id: data.id,
+      id: localId,
       date: data.date,
       crew: data.crew || [],
       expenses: data.expenses || { fuel: 0, food: 0, other: 0 },
@@ -224,8 +268,16 @@ export class SupabaseStorageService {
 
   // Transform to Supabase format
   private static transformToSupabase(trip: FishingTrip, userId: string) {
+    // Get or generate UUID for Supabase
+    const supabaseId = IdMappingService.getSupabaseId(trip.id);
+    
+    // Save the mapping if it's a new one
+    if (!IdMappingService.getMapping()[trip.id]) {
+      IdMappingService.saveMapping(trip.id, supabaseId);
+    }
+    
     return {
-      id: trip.id,
+      id: supabaseId,
       user_id: userId,
       date: trip.date,
       crew: trip.crew,
