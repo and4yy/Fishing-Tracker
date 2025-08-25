@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Card, CardContent } from "@/components/ui/card";
-import { StorageService } from "@/lib/storage";
+import { SupabaseStorageService } from "@/lib/supabase-storage";
 import { FishingTrip, FishSale } from "@/types/fishing";
 import { useToast } from "@/hooks/use-toast";
 
@@ -24,8 +24,8 @@ export function UnpaidSalesNotification() {
   const [unpaidSales, setUnpaidSales] = useState<UnpaidSaleWithTrip[]>([]);
   const { toast } = useToast();
 
-  const loadUnpaidSales = () => {
-    const trips = StorageService.getAllTrips();
+  const loadUnpaidSales = async () => {
+    const trips = await SupabaseStorageService.getAllTrips();
     const unpaid: UnpaidSaleWithTrip[] = [];
     
     trips.forEach(trip => {
@@ -56,17 +56,17 @@ export function UnpaidSalesNotification() {
     return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
-  const markAsPaid = (saleId: string, tripId: string) => {
-    const trips = StorageService.getAllTrips();
+  const markAsPaid = async (saleId: string, tripId: string) => {
+    const trips = await SupabaseStorageService.getAllTrips();
     const trip = trips.find(t => t.id === tripId);
-    
+
     if (trip && trip.fishSales && Array.isArray(trip.fishSales)) {
       const sale = trip.fishSales.find(s => s.id === saleId);
       if (sale) {
         sale.paid = true;
-        StorageService.saveTrip(trip);
+        await SupabaseStorageService.saveTrip(trip);
         loadUnpaidSales();
-        
+
         toast({
           title: "Payment Updated",
           description: `Sale to ${sale.name} marked as paid.`,

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { TripForm } from "@/components/forms/trip-form";
-import { StorageService } from "@/lib/storage";
+import { SupabaseStorageService } from "@/lib/supabase-storage";
 import { FishingTrip } from "@/types/fishing";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft } from "lucide-react";
@@ -15,38 +15,39 @@ export default function EditTrip() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!id) {
-      navigate('/history');
-      return;
-    }
+    const loadTrip = async () => {
+      if (!id) return;
 
-    const foundTrip = StorageService.getTripById(id);
-    if (!foundTrip) {
-      toast({
-        title: "Trip not found",
-        description: "The requested trip could not be found.",
-        variant: "destructive"
-      });
-      navigate('/history');
-      return;
-    }
+      const foundTrip = await SupabaseStorageService.getTripById(id);
+      if (!foundTrip) {
+        toast({
+          title: "Trip not found",
+          description: "The requested trip could not be found.",
+          variant: "destructive"
+        });
+        navigate('/trips');
+        return;
+      }
 
-    setTrip(foundTrip);
-    setLoading(false);
+      setTrip(foundTrip);
+      setLoading(false);
+    };
+
+    loadTrip();
   }, [id, navigate, toast]);
 
-  const handleSubmit = (updatedTrip: FishingTrip) => {
+  const handleSave = async (updatedTrip: FishingTrip) => {
     try {
-      StorageService.saveTrip(updatedTrip);
+      await SupabaseStorageService.saveTrip(updatedTrip);
       toast({
         title: "Trip updated successfully",
-        description: "Your fishing trip has been updated."
+        description: "Your fishing trip has been saved."
       });
-      navigate('/history');
+      navigate('/trips');
     } catch (error) {
       toast({
-        title: "Error updating trip",
-        description: "There was a problem updating your trip. Please try again.",
+        title: "Error saving trip",
+        description: "There was an error saving your trip. Please try again.",
         variant: "destructive"
       });
     }
@@ -81,7 +82,7 @@ export default function EditTrip() {
         </div>
       </div>
 
-      <TripForm onSubmit={handleSubmit} initialData={{...trip, fishSales: trip.fishSales || []}} isEditing />
+      <TripForm onSubmit={handleSave} initialData={{...trip, fishSales: trip.fishSales || []}} isEditing />
     </div>
   );
 }

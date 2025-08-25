@@ -14,6 +14,66 @@ export type Database = {
   }
   public: {
     Tables: {
+      fishing_trips: {
+        Row: {
+          created_at: string
+          crew: string[]
+          date: string
+          expenses: Json
+          fish_sales: Json
+          hire_details: Json | null
+          id: string
+          owner_profit: number
+          owner_share_percent: number
+          profit: number
+          profit_per_crew: number
+          total_catch: number
+          total_sales: number
+          trip_type: string
+          updated_at: string
+          user_id: string
+          weather_conditions: Json | null
+        }
+        Insert: {
+          created_at?: string
+          crew?: string[]
+          date: string
+          expenses?: Json
+          fish_sales?: Json
+          hire_details?: Json | null
+          id?: string
+          owner_profit?: number
+          owner_share_percent?: number
+          profit?: number
+          profit_per_crew?: number
+          total_catch?: number
+          total_sales?: number
+          trip_type: string
+          updated_at?: string
+          user_id: string
+          weather_conditions?: Json | null
+        }
+        Update: {
+          created_at?: string
+          crew?: string[]
+          date?: string
+          expenses?: Json
+          fish_sales?: Json
+          hire_details?: Json | null
+          id?: string
+          owner_profit?: number
+          owner_share_percent?: number
+          profit?: number
+          profit_per_crew?: number
+          total_catch?: number
+          total_sales?: number
+          trip_type?: string
+          updated_at?: string
+          user_id?: string
+          weather_conditions?: Json | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null

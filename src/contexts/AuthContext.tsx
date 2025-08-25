@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import { SupabaseStorageService } from '@/lib/supabase-storage';
 
 interface AuthContextType {
   user: User | null;
@@ -40,6 +41,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
+        
+        // Sync local data when user signs in
+        if (event === 'SIGNED_IN' && session?.user) {
+          setTimeout(() => {
+            SupabaseStorageService.syncLocalDataToSupabase().then(() => {
+              console.log('Local data synced to Supabase successfully');
+            }).catch(error => {
+              console.error('Failed to sync local data:', error);
+            });
+          }, 0);
+        }
       }
     );
 

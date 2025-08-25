@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { TripList } from "@/components/trips/trip-list";
 import { PaymentStatusUpdater } from "@/components/trips/payment-status-updater";
-import { StorageService } from "@/lib/storage";
+import { SupabaseStorageService } from "@/lib/supabase-storage";
 import { FishingTrip } from "@/types/fishing";
 import { Search, Filter } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -18,8 +18,8 @@ export default function TripHistory() {
   const { toast } = useToast();
 
   useEffect(() => {
-    const loadTrips = () => {
-      const allTrips = StorageService.getAllTrips().sort((a, b) => 
+    const loadTrips = async () => {
+      const allTrips = (await SupabaseStorageService.getAllTrips()).sort((a, b) => 
         new Date(b.date).getTime() - new Date(a.date).getTime()
       );
       setTrips(allTrips);
@@ -55,27 +55,27 @@ export default function TripHistory() {
     navigate(`/edit-trip/${trip.id}`);
   };
 
-  const handleDelete = (id: string) => {
+  const handleDeleteTrip = async (id: string) => {
     try {
-      StorageService.deleteTrip(id);
+      await SupabaseStorageService.deleteTrip(id);
       const updatedTrips = trips.filter(trip => trip.id !== id);
       setTrips(updatedTrips);
       toast({
         title: "Trip deleted",
-        description: "The fishing trip has been removed from your records."
+        description: "The fishing trip has been removed."
       });
     } catch (error) {
       toast({
         title: "Error deleting trip",
-        description: "There was a problem deleting the trip. Please try again.",
+        description: "There was an error deleting the trip. Please try again.",
         variant: "destructive"
       });
     }
   };
 
-  const handleUpdateTrip = (updatedTrip: FishingTrip) => {
+  const handleUpdateTrip = async (updatedTrip: FishingTrip) => {
     try {
-      StorageService.saveTrip(updatedTrip);
+      await SupabaseStorageService.saveTrip(updatedTrip);
       const updatedTrips = trips.map(trip => 
         trip.id === updatedTrip.id ? updatedTrip : trip
       );
@@ -143,7 +143,7 @@ export default function TripHistory() {
       <TripList
         trips={filteredTrips}
         onEdit={handleEdit}
-        onDelete={handleDelete}
+        onDelete={handleDeleteTrip}
       />
     </div>
   );

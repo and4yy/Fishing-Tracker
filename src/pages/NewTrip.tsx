@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { TripForm } from "@/components/forms/trip-form";
-import { StorageService } from "@/lib/storage";
+import { SupabaseStorageService } from "@/lib/supabase-storage";
 import { FishingTrip } from "@/types/fishing";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft } from "lucide-react";
@@ -10,9 +10,9 @@ export default function NewTrip() {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleSubmit = (trip: FishingTrip) => {
+  const handleSave = async (trip: FishingTrip) => {
     try {
-      StorageService.saveTrip(trip);
+      await SupabaseStorageService.saveTrip(trip);
       toast({
         title: "Trip saved successfully",
         description: "Your fishing trip has been recorded."
@@ -21,13 +21,13 @@ export default function NewTrip() {
     } catch (error) {
       toast({
         title: "Error saving trip",
-        description: "There was a problem saving your trip. Please try again.",
+        description: "There was an error saving your trip. Please try again.",
         variant: "destructive"
       });
     }
   };
 
-  const handleSaveBasic = (partialTrip: Partial<FishingTrip>) => {
+  const handleSaveBasic = async (partialTrip: Partial<FishingTrip>) => {
     try {
       // For basic save, we create a minimal trip object with default values
       const basicTrip: FishingTrip = {
@@ -44,8 +44,8 @@ export default function NewTrip() {
         profitPerCrew: 0,
         ownerProfit: 0,
       };
-      
-      StorageService.saveTrip(basicTrip);
+
+      await SupabaseStorageService.saveTrip(basicTrip);
       toast({
         title: "Basic trip details saved",
         description: "You can continue adding fish sales and complete the trip later."
@@ -71,7 +71,7 @@ export default function NewTrip() {
         </div>
       </div>
 
-      <TripForm onSubmit={handleSubmit} onSaveBasic={handleSaveBasic} />
+      <TripForm onSubmit={handleSave} onSaveBasic={handleSaveBasic} />
     </div>
   );
 }

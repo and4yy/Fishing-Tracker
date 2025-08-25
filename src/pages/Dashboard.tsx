@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { SummaryCards } from "@/components/dashboard/summary-cards";
 import { UnpaidSalesNotification } from "@/components/notifications/unpaid-sales-notification";
-import { StorageService } from "@/lib/storage";
+import { SupabaseStorageService } from "@/lib/supabase-storage";
 import { exportToExcel } from "@/lib/export";
 import { TripSummary } from "@/types/fishing";
 import { BoatSettings } from "@/types/settings";
@@ -34,8 +34,8 @@ export default function Dashboard() {
   const { toast } = useToast();
 
   useEffect(() => {
-    const loadData = () => {
-      const summaryData = StorageService.getSummary();
+    const loadData = async () => {
+      const summaryData = await SupabaseStorageService.getSummary();
       setSummary(summaryData);
       
       const settings = BoatSettingsService.getSettings();
@@ -51,9 +51,9 @@ export default function Dashboard() {
     return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
-  const handleExport = () => {
+  const handleExportData = async () => {
     try {
-      const trips = StorageService.getAllTrips();
+      const trips = await SupabaseStorageService.getAllTrips();
       if (trips.length === 0) {
         toast({
           title: "No data to export",
@@ -146,12 +146,12 @@ export default function Dashboard() {
       <div className="space-y-4">
         <h2 className="text-xl font-semibold">Quick Actions</h2>
         <div className="grid gap-3">
-          <Button 
-            onClick={handleExport} 
-            variant="outline" 
-            className="w-full justify-start"
-            disabled={summary.totalTrips === 0}
-          >
+            <Button 
+              onClick={handleExportData} 
+              variant="outline" 
+              className="w-full justify-start"
+              disabled={summary.totalTrips === 0}
+            >
             <Download className="h-4 w-4 mr-2" />
             Export to Excel
             {summary.totalTrips === 0 && (
