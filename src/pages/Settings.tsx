@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { BoatSettingsForm } from "@/components/settings/boat-settings";
 import { UserAuth } from "@/components/auth/UserAuth";
+import { PushNotificationSettings } from "@/components/notifications/push-notification-settings";
 import { ArrowLeft } from "lucide-react";
 
 export default function Settings() {
@@ -21,6 +22,7 @@ export default function Settings() {
 
       <UserAuth />
       <BoatSettingsForm onSave={() => navigate('/')} />
+      <PushNotificationSettings />
     </div>
   );
 }
