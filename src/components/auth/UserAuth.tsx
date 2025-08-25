@@ -64,7 +64,7 @@ export function UserAuth() {
   };
 
   const handleWhatsAppContact = () => {
-    const phoneNumber = '9607371611';
+    const phoneNumber = '7371611';
     const message = 'Hello, I would like to register for an account to enable online data saving.';
     
     // Check if user is on mobile device
