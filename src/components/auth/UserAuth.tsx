@@ -66,24 +66,52 @@ export function UserAuth() {
   const handleWhatsAppContact = () => {
     const phoneNumber = '9607371611';
     const message = 'Hello, I would like to register for an account to enable online data saving.';
-    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
     
-    try {
-      window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
-    } catch (error) {
-      // Fallback: copy phone number to clipboard
-      navigator.clipboard.writeText(`+960 ${phoneNumber}`).then(() => {
-        toast({
-          title: 'Phone number copied!',
-          description: 'WhatsApp link blocked. Phone number copied to clipboard: +960 7371611'
+    // Check if user is on mobile device
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
+    if (isMobile) {
+      // For mobile devices, use whatsapp:// scheme first, fallback to wa.me
+      const whatsappScheme = `whatsapp://send?phone=960${phoneNumber}&text=${encodeURIComponent(message)}`;
+      const whatsappWeb = `https://wa.me/960${phoneNumber}?text=${encodeURIComponent(message)}`;
+      
+      // Try opening WhatsApp app directly
+      window.location.href = whatsappScheme;
+      
+      // Fallback to web version after a short delay
+      setTimeout(() => {
+        try {
+          window.open(whatsappWeb, '_blank', 'noopener,noreferrer');
+        } catch (error) {
+          // Final fallback - show phone number
+          toast({
+            title: 'Contact via WhatsApp',
+            description: `Please contact us at +960 ${phoneNumber} via WhatsApp for registration.`,
+            duration: 5000
+          });
+        }
+      }, 500);
+    } else {
+      // For desktop, use wa.me directly
+      const whatsappUrl = `https://wa.me/960${phoneNumber}?text=${encodeURIComponent(message)}`;
+      
+      try {
+        window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+      } catch (error) {
+        // Fallback: copy phone number to clipboard
+        navigator.clipboard.writeText(`+960 ${phoneNumber}`).then(() => {
+          toast({
+            title: 'Phone number copied!',
+            description: `WhatsApp link blocked. Phone number copied to clipboard: +960 ${phoneNumber}`
+          });
+        }).catch(() => {
+          toast({
+            title: 'Contact Information',
+            description: `Please contact us at +960 ${phoneNumber} via WhatsApp for registration.`,
+            variant: 'default'
+          });
         });
-      }).catch(() => {
-        toast({
-          title: 'Contact Information',
-          description: 'Please contact us at +960 7371611 via WhatsApp for registration.',
-          variant: 'default'
-        });
-      });
+      }
     }
   };
 
