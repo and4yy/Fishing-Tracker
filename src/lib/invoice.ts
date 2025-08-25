@@ -454,39 +454,164 @@ export const generateInvoicePDF = (invoiceData: InvoiceData): string => {
 };
 
 export const downloadInvoiceAsPDF = async (invoiceData: InvoiceData): Promise<void> => {
-  const htmlContent = generateInvoicePDF(invoiceData);
+  const { invoiceNumber, date, customer, boat, fishSale, tripType } = invoiceData;
   
-  // Create a temporary div to render the HTML
-  const tempDiv = document.createElement('div');
-  tempDiv.innerHTML = htmlContent;
-  tempDiv.style.position = 'absolute';
-  tempDiv.style.left = '-9999px';
-  tempDiv.style.top = '0';
-  tempDiv.style.width = '210mm'; // A4 width
-  tempDiv.style.backgroundColor = 'white';
-  document.body.appendChild(tempDiv);
-
+  // Calculate due date (same as invoice date)
+  const dueDate = new Date(date);
+  const formattedDueDate = dueDate.toLocaleDateString();
+  
   try {
-    // Convert HTML to canvas
-    const canvas = await html2canvas(tempDiv, {
-      scale: 2,
-      useCORS: true,
-      allowTaint: true,
-      backgroundColor: '#ffffff'
-    });
-
-    // Create PDF
+    // Create PDF with optimized settings
     const pdf = new jsPDF('p', 'mm', 'a4');
-    const imgData = canvas.toDataURL('image/png');
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
     
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+    // Set margins
+    const margin = 15;
+    let yPos = margin;
     
-    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-    pdf.save(`invoice-${invoiceData.invoiceNumber}.pdf`);
+    // Header section with light blue background
+    pdf.setFillColor(248, 250, 252); // Light blue background
+    pdf.rect(margin, yPos, pageWidth - 2 * margin, 25, 'F');
+    
+    // Company name
+    pdf.setFontSize(16);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setTextColor(30, 64, 175); // Blue color
+    pdf.text(boat.boatName || 'Your Boat Name', margin + 5, yPos + 10);
+    
+    // Contact number
+    pdf.setFontSize(10);
+    pdf.setFont('helvetica', 'normal');
+    pdf.setTextColor(0, 0, 0);
+    pdf.text(boat.contactNumber ? `Contact: ${boat.contactNumber}` : 'Contact: Your Contact Number', margin + 5, yPos + 17);
+    
+    // Invoice title
+    pdf.setFontSize(24);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setTextColor(30, 64, 175);
+    pdf.text('SALES INVOICE', pageWidth - margin - 60, yPos + 15);
+    
+    yPos += 35;
+    
+    // Invoice details section
+    pdf.setFontSize(11);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setTextColor(30, 64, 175);
+    pdf.text('BILL TO', margin, yPos);
+    
+    pdf.text('INVOICE DETAILS', pageWidth - margin - 50, yPos);
+    
+    yPos += 8;
+    
+    // Bill to details
+    pdf.setFont('helvetica', 'normal');
+    pdf.setTextColor(0, 0, 0);
+    pdf.setFontSize(10);
+    pdf.text(customer.name, margin, yPos);
+    pdf.text(`Contact: ${customer.contact}`, margin, yPos + 5);
+    
+    // Invoice meta
+    pdf.text(`Invoice #: ${invoiceNumber}`, pageWidth - margin - 50, yPos);
+    pdf.text(`Invoice date: ${new Date(date).toLocaleDateString()}`, pageWidth - margin - 50, yPos + 5);
+    pdf.text(`Due date: ${formattedDueDate}`, pageWidth - margin - 50, yPos + 10);
+    
+    yPos += 25;
+    
+    // Items table header
+    pdf.setFillColor(219, 234, 254); // Light blue
+    pdf.rect(margin, yPos, pageWidth - 2 * margin, 8, 'F');
+    
+    pdf.setFontSize(10);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setTextColor(30, 64, 175);
+    pdf.text('QTY', margin + 5, yPos + 5.5);
+    pdf.text('Description', margin + 30, yPos + 5.5);
+    pdf.text('Unit Price', margin + 100, yPos + 5.5);
+    pdf.text('Amount', pageWidth - margin - 30, yPos + 5.5);
+    
+    yPos += 8;
+    
+    // Items table content
+    pdf.setFont('helvetica', 'normal');
+    pdf.setTextColor(0, 0, 0);
+    pdf.text(`${fishSale.weight} kg`, margin + 5, yPos + 5);
+    pdf.text(`Fresh Fish Catch (${tripType})`, margin + 30, yPos + 5);
+    pdf.text(`MVR ${fishSale.ratePrice.toFixed(2)}`, margin + 100, yPos + 5);
+    pdf.setFont('helvetica', 'bold');
+    pdf.text(`MVR ${fishSale.totalAmount.toFixed(2)}`, pageWidth - margin - 30, yPos + 5, { align: 'right' });
+    
+    // Table borders
+    pdf.setDrawColor(203, 213, 225);
+    pdf.line(margin, yPos, pageWidth - margin, yPos); // Top line
+    pdf.line(margin, yPos + 8, pageWidth - margin, yPos + 8); // Bottom line
+    pdf.line(margin, yPos, margin, yPos + 8); // Left line
+    pdf.line(pageWidth - margin, yPos, pageWidth - margin, yPos + 8); // Right line
+    
+    yPos += 20;
+    
+    // Totals section
+    const totalsX = pageWidth - margin - 60;
+    pdf.setFontSize(10);
+    pdf.setFont('helvetica', 'normal');
+    pdf.text('Subtotal:', totalsX, yPos);
+    pdf.text(`MVR ${fishSale.totalAmount.toFixed(2)}`, pageWidth - margin - 5, yPos, { align: 'right' });
+    
+    yPos += 8;
+    
+    // Total line with background
+    pdf.setFillColor(241, 245, 249);
+    pdf.rect(totalsX - 5, yPos - 3, 65, 8, 'F');
+    
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(11);
+    pdf.text('Total (MVR):', totalsX, yPos + 2);
+    pdf.text(`MVR ${fishSale.totalAmount.toFixed(2)}`, pageWidth - margin - 5, yPos + 2, { align: 'right' });
+    
+    yPos += 15;
+    
+    // Payment info (if available)
+    if (boat.bankName) {
+      pdf.setFillColor(240, 249, 255);
+      pdf.rect(margin, yPos, pageWidth - 2 * margin, 20, 'F');
+      
+      pdf.setFontSize(10);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(30, 64, 175);
+      pdf.text('Payment Information', margin + 5, yPos + 8);
+      
+      pdf.setFont('helvetica', 'normal');
+      pdf.setTextColor(0, 0, 0);
+      pdf.setFontSize(9);
+      pdf.text(`Bank: ${boat.bankName}`, margin + 5, yPos + 13);
+      pdf.text(`Account Holder: ${boat.accountName}`, margin + 5, yPos + 16);
+      pdf.text(`Account Number: ${boat.accountNumber}`, margin + 5, yPos + 19);
+      
+      yPos += 25;
+    }
+    
+    // Terms and Conditions
+    pdf.setFillColor(248, 250, 252);
+    pdf.rect(margin, yPos, pageWidth - 2 * margin, 25, 'F');
+    
+    pdf.setFontSize(10);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setTextColor(30, 64, 175);
+    pdf.text('Terms and Conditions', margin + 5, yPos + 8);
+    
+    pdf.setFont('helvetica', 'normal');
+    pdf.setTextColor(0, 0, 0);
+    pdf.setFontSize(9);
+    pdf.text('Payment is due on receipt, unless otherwise agreed.', margin + 5, yPos + 13);
+    pdf.text('Please check the invoice details carefully.', margin + 5, yPos + 16);
+    pdf.text('Any discrepancies must be reported immediately.', margin + 5, yPos + 19);
+    
+    // Save PDF
+    pdf.save(`invoice-${invoiceNumber}.pdf`);
   } catch (error) {
     console.error('Error generating PDF:', error);
     // Fallback to HTML download if PDF generation fails
+    const htmlContent = generateInvoicePDF(invoiceData);
     const blob = new Blob([htmlContent], { type: 'text/html' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -496,9 +621,6 @@ export const downloadInvoiceAsPDF = async (invoiceData: InvoiceData): Promise<vo
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
-  } finally {
-    // Clean up temporary div
-    document.body.removeChild(tempDiv);
   }
 };
 
