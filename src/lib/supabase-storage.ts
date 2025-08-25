@@ -96,8 +96,8 @@ export class SupabaseStorageService {
         throw new Error('Failed to save trip online, saved locally instead');
       }
 
-      // Also save locally as backup
-      StorageService.saveTrip(trip);
+      // Don't save locally when successfully saved to Supabase to avoid duplicates
+      // Local storage is only used as fallback when offline
     } catch (error) {
       console.error('Error in saveTrip:', error);
       // Always ensure it's saved locally
@@ -126,11 +126,12 @@ export class SupabaseStorageService {
 
       if (error) {
         console.error('Error deleting trip from Supabase:', error);
+        // Fallback to local storage deletion only if Supabase fails
+        StorageService.deleteTrip(id);
         throw new Error('Failed to delete trip online');
       }
 
-      // Also delete locally
-      StorageService.deleteTrip(id);
+      // Successfully deleted from Supabase - no need to delete locally
     } catch (error) {
       console.error('Error in deleteTrip:', error);
       throw error;
