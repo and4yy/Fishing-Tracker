@@ -10,6 +10,7 @@ import { BoatSettingsService } from "@/components/settings/boat-settings";
 import { Download, Anchor, Settings } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { WeatherCard } from "@/components/weather/weather-card";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 export default function Dashboard() {
   const [summary, setSummary] = useState<TripSummary>({
@@ -31,6 +32,7 @@ export default function Dashboard() {
     accountNumber: '',
     accountName: ''
   });
+  const [crewPayouts, setCrewPayouts] = useState<Array<{name: string, payout: number}>>([]);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -40,6 +42,27 @@ export default function Dashboard() {
       
       const settings = BoatSettingsService.getSettings();
       setBoatSettings(settings);
+
+      // Calculate crew payouts from trip history
+      const trips = await SupabaseStorageService.getAllTrips();
+      const crewPayoutMap = new Map<string, number>();
+
+      trips.forEach(trip => {
+        if (trip.crew && trip.crew.length > 0 && trip.profitPerCrew > 0) {
+          trip.crew.forEach(crewMember => {
+            const currentPayout = crewPayoutMap.get(crewMember) || 0;
+            crewPayoutMap.set(crewMember, currentPayout + trip.profitPerCrew);
+          });
+        }
+      });
+
+      // Convert to array and sort by payout (descending)
+      const crewPayoutsArray = Array.from(crewPayoutMap.entries())
+        .map(([name, payout]) => ({ name, payout }))
+        .sort((a, b) => b.payout - a.payout)
+        .slice(0, 10); // Show top 10 crew members
+
+      setCrewPayouts(crewPayoutsArray);
     };
 
     loadData();
@@ -180,6 +203,48 @@ export default function Dashboard() {
                 <div className="text-muted-foreground">Avg. Profit per Trip</div>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Crew Payouts Chart */}
+      {crewPayouts.length > 0 && (
+        <div className="space-y-4">
+          <h2 className="text-xl font-semibold">Crew Member Payouts</h2>
+          <div className="bg-card p-6 rounded-lg border">
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={crewPayouts} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+                <XAxis 
+                  dataKey="name" 
+                  angle={-45}
+                  textAnchor="end"
+                  height={80}
+                  fontSize={12}
+                />
+                <YAxis 
+                  tickFormatter={(value) => `MVR ${value.toFixed(0)}`}
+                  fontSize={12}
+                />
+                <Tooltip 
+                  formatter={(value: number) => [`MVR ${value.toFixed(2)}`, 'Total Payout']}
+                  labelClassName="text-foreground"
+                  contentStyle={{
+                    backgroundColor: 'hsl(var(--card))',
+                    border: '1px solid hsl(var(--border))',
+                    borderRadius: '6px'
+                  }}
+                />
+                <Bar 
+                  dataKey="payout" 
+                  fill="hsl(var(--primary))"
+                  radius={[4, 4, 0, 0]}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+            <p className="text-sm text-muted-foreground mt-4 text-center">
+              Total payouts earned by crew members across all fishing trips
+            </p>
           </div>
         </div>
       )}
