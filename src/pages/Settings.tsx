@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { BoatSettingsForm } from "@/components/settings/boat-settings";
 import { UserAuth } from "@/components/auth/UserAuth";
@@ -10,6 +11,7 @@ import { ArrowLeft } from "lucide-react";
 export default function Settings() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [activeTab, setActiveTab] = useState('login');
 
   return (
     <div className="container mx-auto p-4 pb-20 space-y-6">
@@ -23,10 +25,12 @@ export default function Settings() {
         </div>
       </div>
 
-      <UserAuth />
+      <UserAuth onTabChange={setActiveTab} />
       
-      {/* Boat Settings - available for both offline and online use */}
-      <BoatSettingsForm onSave={() => navigate('/')} />
+      {/* Boat Settings - available for both offline and online use, but hidden during registration */}
+      {(!user || activeTab !== 'register') && (
+        <BoatSettingsForm onSave={() => navigate('/')} />
+      )}
       
       {/* Online-only features */}
       {user && <NotificationSettings />}

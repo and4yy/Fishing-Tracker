@@ -8,10 +8,11 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { User, LogOut, Mail, Lock, UserPlus, LogIn, MessageCircle } from 'lucide-react';
 
-export function UserAuth() {
+export function UserAuth({ onTabChange }: { onTabChange?: (tab: string) => void }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState('login');
   const { user, signUp, signIn, signOut } = useAuth();
   const { toast } = useToast();
 
@@ -174,7 +175,10 @@ export function UserAuth() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <Tabs defaultValue="login" className="w-full">
+        <Tabs defaultValue="login" className="w-full" onValueChange={(value) => {
+          setActiveTab(value);
+          onTabChange?.(value);
+        }}>
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="login" className="flex items-center gap-2">
               <LogIn className="h-4 w-4" />
