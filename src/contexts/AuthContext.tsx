@@ -86,11 +86,49 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
-    return { error };
+
+    if (error) {
+      return { error };
+    }
+
+    // Check user approval status
+    if (data.user) {
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('status')
+        .eq('user_id', data.user.id)
+        .single();
+
+      if (profileError) {
+        return { error: profileError };
+      }
+
+      if (profile.status === 'pending') {
+        // Sign out the user immediately
+        await supabase.auth.signOut();
+        return { 
+          error: { 
+            message: 'Your account is pending approval. Please wait for administrator approval before signing in.' 
+          } 
+        };
+      }
+
+      if (profile.status === 'rejected') {
+        // Sign out the user immediately
+        await supabase.auth.signOut();
+        return { 
+          error: { 
+            message: 'Your account has been rejected. Please contact the administrator for more information.' 
+          } 
+        };
+      }
+    }
+
+    return { error: null };
   };
 
   const signOut = async () => {

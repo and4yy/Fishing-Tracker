@@ -25,6 +25,7 @@ const tripTypes: Array<FishingTrip['tripType']> = ['Private Hire', 'Yellow Fin T
 
 export function TripForm({ onSubmit, onSaveBasic, initialData, isEditing = false }: TripFormProps) {
   const { toast } = useToast();
+  const [basicDetailsSaved, setBasicDetailsSaved] = useState(isEditing || false);
   const [formData, setFormData] = useState({
     date: initialData?.date || new Date().toISOString().split('T')[0],
     crew: initialData?.crew || [''],
@@ -186,9 +187,10 @@ export function TripForm({ onSubmit, onSaveBasic, initialData, isEditing = false
     };
     
     onSaveBasic(basicTrip);
+    setBasicDetailsSaved(true);
     toast({
       title: "Basic trip details saved",
-      description: "You can continue adding fish sales."
+      description: "You can now add fish sales and view profit calculations."
     });
   };
 
@@ -451,10 +453,11 @@ export function TripForm({ onSubmit, onSaveBasic, initialData, isEditing = false
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Fish Sale Details</CardTitle>
-        </CardHeader>
+      {basicDetailsSaved && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Fish Sale Details</CardTitle>
+          </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
             <div>
@@ -583,82 +586,89 @@ export function TripForm({ onSubmit, onSaveBasic, initialData, isEditing = false
             </div>
           )}
         </CardContent>
-      </Card>
+        </Card>
+      )}
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Catch & Sales</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {basicDetailsSaved && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Catch & Sales</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="catch">Total Catch (kg)</Label>
+                <Input
+                  id="catch"
+                  type="number"
+                  step="0.1"
+                  value={formData.totalCatch}
+                  onFocus={handleNumberFocus}
+                  onChange={(e) => setFormData(prev => ({ ...prev, totalCatch: parseFloat(e.target.value) || 0 }))}
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="sales">Total Sales (MVR)</Label>
+                <Input
+                  id="sales"
+                  type="number"
+                  step="0.01"
+                  value={formData.totalSales}
+                  onFocus={handleNumberFocus}
+                  onChange={(e) => setFormData(prev => ({ ...prev, totalSales: parseFloat(e.target.value) || 0 }))}
+                  required
+                />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {basicDetailsSaved && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Profit Distribution</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
             <div>
-              <Label htmlFor="catch">Total Catch (kg)</Label>
+              <Label htmlFor="ownerShare">Owner Share (%)</Label>
               <Input
-                id="catch"
+                id="ownerShare"
                 type="number"
-                step="0.1"
-                value={formData.totalCatch}
+                min="0"
+                max="100"
+                value={formData.ownerSharePercent}
                 onFocus={handleNumberFocus}
-                onChange={(e) => setFormData(prev => ({ ...prev, totalCatch: parseFloat(e.target.value) || 0 }))}
-                required
+                onChange={(e) => setFormData(prev => ({ ...prev, ownerSharePercent: parseFloat(e.target.value) || 0 }))}
               />
             </div>
-            <div>
-              <Label htmlFor="sales">Total Sales (MVR)</Label>
-              <Input
-                id="sales"
-                type="number"
-                step="0.01"
-                value={formData.totalSales}
-                onFocus={handleNumberFocus}
-                onChange={(e) => setFormData(prev => ({ ...prev, totalSales: parseFloat(e.target.value) || 0 }))}
-                required
-              />
+            
+            <div className="bg-muted p-4 rounded-lg space-y-2">
+              <div className="text-sm font-medium">Revenue & Profit Calculation:</div>
+              {formData.tripType === 'Private Hire' && hirePrice > 0 && (
+                <div className="text-sm">Hire Price: MVR {hirePrice.toFixed(2)}</div>
+              )}
+              {formData.totalSales > 0 && (
+                <div className="text-sm">Fish Sales: MVR {formData.totalSales.toFixed(2)}</div>
+              )}
+              <div className="text-sm">Total Revenue: MVR {(formData.totalSales + hirePrice).toFixed(2)}</div>
+              <div className="text-sm">Total Expenses: MVR {(formData.expenses.fuel + formData.expenses.food + formData.expenses.other).toFixed(2)}</div>
+              <div className="text-sm font-medium">Net Profit: MVR {profit.toFixed(2)}</div>
+              <div className="border-t pt-2 mt-2">
+                <div className="text-sm">Owner Profit ({formData.ownerSharePercent}%): MVR {distribution.ownerProfit.toFixed(2)}</div>
+                <div className="text-sm">Profit per Crew ({crewCount} members): MVR {distribution.profitPerCrew.toFixed(2)}</div>
+              </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Profit Distribution</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <Label htmlFor="ownerShare">Owner Share (%)</Label>
-            <Input
-              id="ownerShare"
-              type="number"
-              min="0"
-              max="100"
-              value={formData.ownerSharePercent}
-              onFocus={handleNumberFocus}
-              onChange={(e) => setFormData(prev => ({ ...prev, ownerSharePercent: parseFloat(e.target.value) || 0 }))}
-            />
-          </div>
-          
-          <div className="bg-muted p-4 rounded-lg space-y-2">
-            <div className="text-sm font-medium">Revenue & Profit Calculation:</div>
-            {formData.tripType === 'Private Hire' && hirePrice > 0 && (
-              <div className="text-sm">Hire Price: MVR {hirePrice.toFixed(2)}</div>
-            )}
-            {formData.totalSales > 0 && (
-              <div className="text-sm">Fish Sales: MVR {formData.totalSales.toFixed(2)}</div>
-            )}
-            <div className="text-sm">Total Revenue: MVR {(formData.totalSales + hirePrice).toFixed(2)}</div>
-            <div className="text-sm">Total Expenses: MVR {(formData.expenses.fuel + formData.expenses.food + formData.expenses.other).toFixed(2)}</div>
-            <div className="text-sm font-medium">Net Profit: MVR {profit.toFixed(2)}</div>
-            <div className="border-t pt-2 mt-2">
-              <div className="text-sm">Owner Profit ({formData.ownerSharePercent}%): MVR {distribution.ownerProfit.toFixed(2)}</div>
-              <div className="text-sm">Profit per Crew ({crewCount} members): MVR {distribution.profitPerCrew.toFixed(2)}</div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Button type="submit" className="w-full">
-        {isEditing ? 'Update Trip' : 'Save Trip'}
-      </Button>
+      {basicDetailsSaved && (
+        <Button type="submit" className="w-full">
+          {isEditing ? 'Update Trip' : 'Save Trip'}
+        </Button>
+      )}
     </form>
   );
 }
