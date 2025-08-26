@@ -28,7 +28,7 @@ export default function Settings() {
       <UserAuth onTabChange={setActiveTab} />
       
       {/* Boat Settings - available for both offline and online use, but hidden during registration */}
-      {(!user || activeTab !== 'register') && (
+      {activeTab !== 'register' && (
         <BoatSettingsForm onSave={() => navigate('/')} />
       )}
       
