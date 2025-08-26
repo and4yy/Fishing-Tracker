@@ -65,7 +65,7 @@ export function UserAuth() {
 
   const handleWhatsAppContact = () => {
     const phoneNumber = '7371611';
-    const message = 'Hello, I would like to register for an account to enable online data saving.';
+    const message = 'Hello, I have registered for an account and would like to request login approval to enable online data saving. My email is: ' + email;
     
     // Check if user is on mobile device
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
@@ -226,10 +226,55 @@ export function UserAuth() {
           </TabsContent>
 
           <TabsContent value="register" className="space-y-4 mt-4">
+            <form onSubmit={handleSignUp} className="space-y-4">
+              <div>
+                <Label htmlFor="signup-email">Email</Label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="signup-email"
+                    type="email"
+                    placeholder="Enter your email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="pl-10"
+                    required
+                  />
+                </div>
+              </div>
+              <div>
+                <Label htmlFor="signup-password">Password</Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="signup-password"
+                    type="password"
+                    placeholder="Create a password (min 6 characters)"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="pl-10"
+                    minLength={6}
+                    required
+                  />
+                </div>
+              </div>
+              <Button type="submit" className="w-full" disabled={loading}>
+                <UserPlus className="h-4 w-4 mr-2" />
+                {loading ? 'Creating Account...' : 'Create Account'}
+              </Button>
+            </form>
+            
+            <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <h4 className="font-medium mb-2 text-yellow-800">Important Note</h4>
+              <p className="text-sm text-yellow-700 mb-3">
+                After registration, your account will be in pending status. You need admin approval to login and start using online features.
+              </p>
+            </div>
+            
             <div className="p-4 bg-muted/50 rounded-lg border-l-4 border-primary">
-              <h4 className="font-medium mb-3 text-primary">Account Registration</h4>
+              <h4 className="font-medium mb-3 text-primary">Request Login Approval</h4>
               <p className="text-sm text-muted-foreground mb-4">
-                To enable online data saving, users are required to sign up for an account. For registration, please contact us via WhatsApp at <strong>+960 7371611</strong>. A one-time registration fee of MVR 1,000 (One Thousand Maldivian Rufiyaa) applies. Thank you for your understanding and support!
+                Once you've created your account, contact us via WhatsApp at <strong>+960 7371611</strong> to request login approval. A one-time fee of MVR 1,000 applies for account activation.
               </p>
               <Button 
                 variant="outline" 
@@ -238,12 +283,12 @@ export function UserAuth() {
                 className="flex items-center gap-2 bg-[#25D366] hover:bg-[#20c55a] text-white border-[#25D366] hover:border-[#20c55a]"
               >
                 <MessageCircle className="h-4 w-4" />
-                Contact via WhatsApp
+                Request Approval via WhatsApp
               </Button>
             </div>
             
             <div className="p-4 bg-muted/50 rounded-lg">
-              <h4 className="font-medium mb-2">Benefits of creating an account:</h4>
+              <h4 className="font-medium mb-2">Benefits of online account:</h4>
               <ul className="text-sm text-muted-foreground space-y-1">
                 <li>• Access your data from any device</li>
                 <li>• Automatic backup of all fishing trips</li>
