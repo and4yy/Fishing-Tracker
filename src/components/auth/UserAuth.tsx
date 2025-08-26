@@ -11,6 +11,9 @@ import { User, LogOut, Mail, Lock, UserPlus, LogIn, MessageCircle } from 'lucide
 export function UserAuth({ onTabChange }: { onTabChange?: (tab: string) => void }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [contactNumber, setContactNumber] = useState('');
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('login');
   const { user, signUp, signIn, signOut } = useAuth();
@@ -18,7 +21,7 @@ export function UserAuth({ onTabChange }: { onTabChange?: (tab: string) => void 
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password) return;
+    if (!email || !password || !firstName || !lastName || !contactNumber) return;
 
     setLoading(true);
     const { error } = await signUp(email, password);
@@ -32,10 +35,13 @@ export function UserAuth({ onTabChange }: { onTabChange?: (tab: string) => void 
     } else {
       toast({
         title: 'Account created',
-        description: 'Please check your email to verify your account.'
+        description: 'Please check your email to verify your account and contact us via WhatsApp for approval.'
       });
       setEmail('');
       setPassword('');
+      setFirstName('');
+      setLastName('');
+      setContactNumber('');
     }
     setLoading(false);
   };
@@ -66,7 +72,10 @@ export function UserAuth({ onTabChange }: { onTabChange?: (tab: string) => void 
 
   const handleWhatsAppContact = () => {
     const phoneNumber = '7371611';
-    const message = 'Hello, I have registered for an account and would like to request login approval to enable online data saving. My email is: ' + email;
+    const message = `Hello, I have registered for an account and would like to request login approval to enable online data saving. My details are:
+Name: ${firstName} ${lastName}
+Email: ${email}
+Contact: ${contactNumber}`;
     
     // Check if user is on mobile device
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
@@ -231,6 +240,43 @@ export function UserAuth({ onTabChange }: { onTabChange?: (tab: string) => void 
 
           <TabsContent value="register" className="space-y-4 mt-4">
             <form onSubmit={handleSignUp} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="signup-firstname">First Name</Label>
+                  <Input
+                    id="signup-firstname"
+                    type="text"
+                    placeholder="Enter your first name"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="signup-lastname">Last Name</Label>
+                  <Input
+                    id="signup-lastname"
+                    type="text"
+                    placeholder="Enter your last name"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+              
+              <div>
+                <Label htmlFor="signup-contact">Contact Number</Label>
+                <Input
+                  id="signup-contact"
+                  type="tel"
+                  placeholder="Enter contact number (without country code)"
+                  value={contactNumber}
+                  onChange={(e) => setContactNumber(e.target.value)}
+                  required
+                />
+              </div>
+              
               <div>
                 <Label htmlFor="signup-email">Email</Label>
                 <div className="relative">
