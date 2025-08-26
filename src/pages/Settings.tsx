@@ -2,7 +2,6 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { BoatSettingsForm } from "@/components/settings/boat-settings";
 import { UserAuth } from "@/components/auth/UserAuth";
-import { UserRegistration } from "@/components/auth/UserRegistration";
 import { AdminUserApproval } from "@/components/auth/AdminUserApproval";
 import { NotificationSettings } from "@/components/settings/notification-settings";
 import { useAuth } from "@/contexts/AuthContext";
@@ -25,13 +24,12 @@ export default function Settings() {
       </div>
 
       <UserAuth />
-      {user && <BoatSettingsForm onSave={() => navigate('/')} />}
+      
+      {/* Boat Settings - available for both offline and online use */}
+      <BoatSettingsForm onSave={() => navigate('/')} />
+      
+      {/* Online-only features */}
       {user && <NotificationSettings />}
-      
-      {/* User Registration Form - visible to all */}
-      <UserRegistration />
-      
-      {/* Admin User Approval - only visible to admin users */}
       {user && <AdminUserApproval />}
     </div>
   );

@@ -167,76 +167,92 @@ export function UserAuth() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <User className="h-5 w-5" />
-          Save Data Online
+          Account Management
         </CardTitle>
         <CardDescription>
-          Create an account to save your data online and access it from any device
+          Sign in to existing account or register for online data saving
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4">
-          <form onSubmit={handleSignIn} className="space-y-4">
-            <div>
-              <Label htmlFor="signin-email">Email</Label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="signin-email"
-                  type="email"
-                  placeholder="Enter your email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="pl-10"
-                  required
-                />
-              </div>
-            </div>
-            <div>
-              <Label htmlFor="signin-password">Password</Label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="signin-password"
-                  type="password"
-                  placeholder="Enter your password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="pl-10"
-                  required
-                />
-              </div>
-            </div>
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? 'Signing in...' : 'Sign In'}
-            </Button>
-          </form>
+        <Tabs defaultValue="login" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="login" className="flex items-center gap-2">
+              <LogIn className="h-4 w-4" />
+              Login
+            </TabsTrigger>
+            <TabsTrigger value="register" className="flex items-center gap-2">
+              <UserPlus className="h-4 w-4" />
+              Register
+            </TabsTrigger>
+          </TabsList>
           
-          <div className="mt-6 p-4 bg-muted/50 rounded-lg border-l-4 border-primary">
-            <h4 className="font-medium mb-3 text-primary">Account Registration</h4>
-            <p className="text-sm text-muted-foreground mb-4">
-              To enable online data saving, users are required to sign up for an account. For registration, please contact us via WhatsApp at <strong>+960 7371611</strong>. A one-time registration fee of MVR 1,000 (One Thousand Maldivian Rufiyaa) applies. Thank you for your understanding and support!
-            </p>
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={handleWhatsAppContact}
-              className="flex items-center gap-2 bg-[#25D366] hover:bg-[#20c55a] text-white border-[#25D366] hover:border-[#20c55a]"
-            >
-              <MessageCircle className="h-4 w-4" />
-              Contact via WhatsApp
-            </Button>
-          </div>
-        </div>
-        
-        <div className="mt-4 p-4 bg-muted/50 rounded-lg">
-          <h4 className="font-medium mb-2">Benefits of creating an account:</h4>
-          <ul className="text-sm text-muted-foreground space-y-1">
-            <li>• Access your data from any device</li>
-            <li>• Automatic backup of all fishing trips</li>
-            <li>• Secure cloud storage</li>
-            <li>• Never lose your data</li>
-          </ul>
-        </div>
+          <TabsContent value="login" className="space-y-4 mt-4">
+            <form onSubmit={handleSignIn} className="space-y-4">
+              <div>
+                <Label htmlFor="signin-email">Email</Label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="signin-email"
+                    type="email"
+                    placeholder="Enter your email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="pl-10"
+                    required
+                  />
+                </div>
+              </div>
+              <div>
+                <Label htmlFor="signin-password">Password</Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="signin-password"
+                    type="password"
+                    placeholder="Enter your password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="pl-10"
+                    required
+                  />
+                </div>
+              </div>
+              <Button type="submit" className="w-full" disabled={loading}>
+                <LogIn className="h-4 w-4 mr-2" />
+                {loading ? 'Signing in...' : 'Sign In'}
+              </Button>
+            </form>
+          </TabsContent>
+
+          <TabsContent value="register" className="space-y-4 mt-4">
+            <div className="p-4 bg-muted/50 rounded-lg border-l-4 border-primary">
+              <h4 className="font-medium mb-3 text-primary">Account Registration</h4>
+              <p className="text-sm text-muted-foreground mb-4">
+                To enable online data saving, users are required to sign up for an account. For registration, please contact us via WhatsApp at <strong>+960 7371611</strong>. A one-time registration fee of MVR 1,000 (One Thousand Maldivian Rufiyaa) applies. Thank you for your understanding and support!
+              </p>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={handleWhatsAppContact}
+                className="flex items-center gap-2 bg-[#25D366] hover:bg-[#20c55a] text-white border-[#25D366] hover:border-[#20c55a]"
+              >
+                <MessageCircle className="h-4 w-4" />
+                Contact via WhatsApp
+              </Button>
+            </div>
+            
+            <div className="p-4 bg-muted/50 rounded-lg">
+              <h4 className="font-medium mb-2">Benefits of creating an account:</h4>
+              <ul className="text-sm text-muted-foreground space-y-1">
+                <li>• Access your data from any device</li>
+                <li>• Automatic backup of all fishing trips</li>
+                <li>• Secure cloud storage</li>
+                <li>• Never lose your data</li>
+              </ul>
+            </div>
+          </TabsContent>
+        </Tabs>
       </CardContent>
     </Card>
   );
