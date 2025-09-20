@@ -403,7 +403,7 @@ export const generateInvoicePDF = (invoiceData: InvoiceData): string => {
                 <tbody>
                     <tr>
                         <td>${fishSale.weight} kg</td>
-                        <td>Fresh Fish Catch</td>
+                        <td>${tripType} - Freshly Cached</td>
                         <td>MVR ${fishSale.ratePrice.toFixed(2)}</td>
                         <td>MVR ${fishSale.totalAmount.toFixed(2)}</td>
                     </tr>
@@ -552,7 +552,7 @@ export const downloadInvoiceAsPDF = async (invoiceData: InvoiceData): Promise<vo
     pdf.setFont('helvetica', 'normal');
     pdf.setTextColor(0, 0, 0);
     pdf.text(`${fishSale.weight} kg`, margin + 5, yPos + 6);
-    pdf.text('Fresh Fish Catch', margin + 30, yPos + 6);
+    pdf.text(`${tripType} - Freshly Cached`, margin + 30, yPos + 6);
     pdf.text(`MVR ${fishSale.ratePrice.toFixed(2)}`, margin + 100, yPos + 6);
     pdf.setFont('helvetica', 'bold');
     pdf.text(`MVR ${fishSale.totalAmount.toFixed(2)}`, pageWidth - margin - 30, yPos + 6, { align: 'right' });
