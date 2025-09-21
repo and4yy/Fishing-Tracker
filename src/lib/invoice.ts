@@ -640,20 +640,121 @@ export const downloadInvoiceAsPDF = async (invoiceData: InvoiceData): Promise<vo
   }
 };
 
-export const printInvoice = (invoiceData: InvoiceData): void => {
-  const htmlContent = generateInvoicePDF(invoiceData);
+export const shareInvoiceWhatsApp = async (invoiceData: InvoiceData): Promise<void> => {
+  const { customer, fishSale } = invoiceData;
   
-  // Open a new window and print
-  const printWindow = window.open('', '_blank');
-  if (printWindow) {
-    printWindow.document.write(htmlContent);
-    printWindow.document.close();
-    printWindow.focus();
-    
-    // Wait for content to load then print
-    setTimeout(() => {
-      printWindow.print();
-      printWindow.close();
-    }, 250);
+  // Create invoice message
+  const message = `Hi ${customer.name}! 🧾\n\nYour fish purchase invoice is ready:\n📄 Invoice: ${invoiceData.invoiceNumber}\n🐟 ${fishSale.weight}kg - ${invoiceData.tripType}\n💰 Total: MVR ${fishSale.totalAmount.toFixed(2)}\n\nThank you for your business!`;
+  
+  // Detect if mobile device
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  
+  if (isMobile && navigator.share && navigator.canShare) {
+    // Try native sharing with PDF on mobile
+    try {
+      // Generate PDF as blob for sharing
+      await generatePDFBlob(invoiceData).then(async (pdfBlob) => {
+        const file = new File([pdfBlob], `invoice-${invoiceData.invoiceNumber}.pdf`, { type: 'application/pdf' });
+        
+        if (navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            title: `Invoice ${invoiceData.invoiceNumber}`,
+            text: message,
+            files: [file]
+          });
+        } else {
+          throw new Error('File sharing not supported');
+        }
+      });
+      return;
+    } catch (error) {
+      // Fallback to WhatsApp URL if native sharing fails
+    }
   }
+  
+  // Use WhatsApp URL (works on both mobile and desktop)
+  const phoneNumber = customer.contact.replace(/\D/g, ''); // Remove non-digits
+  const encodedMessage = encodeURIComponent(message);
+  
+  if (isMobile) {
+    // For mobile devices, try WhatsApp app first
+    const whatsappScheme = `whatsapp://send?phone=960${phoneNumber}&text=${encodedMessage}`;
+    const whatsappWeb = `https://wa.me/960${phoneNumber}?text=${encodedMessage}`;
+    
+    try {
+      window.location.href = whatsappScheme;
+      
+      // Fallback to web version if app doesn't open
+      setTimeout(() => {
+        window.open(whatsappWeb, '_blank', 'noopener,noreferrer');
+      }, 500);
+    } catch (error) {
+      window.open(whatsappWeb, '_blank', 'noopener,noreferrer');
+    }
+  } else {
+    // For desktop, use WhatsApp Web
+    const whatsappUrl = `https://wa.me/960${phoneNumber}?text=${encodedMessage}`;
+    window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+  }
+};
+
+// Helper function to generate PDF as blob
+const generatePDFBlob = async (invoiceData: InvoiceData): Promise<Blob> => {
+  const { jsPDF } = await import('jspdf');
+  const html2canvas = (await import('html2canvas')).default;
+  
+  const { invoiceNumber, date, customer, boat, fishSale, tripType } = invoiceData;
+  const dueDate = new Date(date);
+  
+  const pdf = new jsPDF();
+  const pageWidth = pdf.internal.pageSize.width;
+  const pageHeight = pdf.internal.pageSize.height;
+  const margin = 20;
+  
+  // Header
+  pdf.setFillColor(41, 128, 185);
+  pdf.rect(0, 0, pageWidth, 40, 'F');
+  
+  pdf.setFont('helvetica', 'bold');
+  pdf.setFontSize(24);
+  pdf.setTextColor(255, 255, 255);
+  pdf.text('INVOICE', margin, 25);
+  
+  // Invoice details
+  pdf.setFont('helvetica', 'normal');
+  pdf.setFontSize(10);
+  pdf.setTextColor(0, 0, 0);
+  pdf.text(`Invoice #: ${invoiceNumber}`, margin, 60);
+  pdf.text(`Date: ${new Date(date).toLocaleDateString()}`, margin, 70);
+  pdf.text(`Due Date: ${dueDate.toLocaleDateString()}`, margin, 80);
+  
+  // Bill to section
+  pdf.setFont('helvetica', 'bold');
+  pdf.setFontSize(12);
+  pdf.text('BILL TO:', margin, 100);
+  
+  pdf.setFont('helvetica', 'normal');
+  pdf.setFontSize(10);
+  pdf.text(customer.name, margin, 115);
+  pdf.text(`Contact: ${customer.contact}`, margin, 125);
+  
+  // From section
+  pdf.setFont('helvetica', 'bold');
+  pdf.setFontSize(12);
+  pdf.text('FROM:', pageWidth - margin - 80, 100);
+  
+  pdf.setFont('helvetica', 'normal');
+  pdf.setFontSize(10);
+  pdf.text(boat.boatName, pageWidth - margin - 80, 115);
+  pdf.text(boat.ownerName, pageWidth - margin - 80, 125);
+  
+  // Item details
+  const yPos = 160;
+  pdf.setFont('helvetica', 'bold');
+  pdf.text(`${fishSale.weight} kg`, margin + 5, yPos + 6);
+  pdf.text(`${tripType} - Freshly Cached`, margin + 30, yPos + 6);
+  pdf.text(`MVR ${fishSale.ratePrice.toFixed(2)}`, margin + 100, yPos + 6);
+  pdf.text(`MVR ${fishSale.totalAmount.toFixed(2)}`, pageWidth - margin - 30, yPos + 6, { align: 'right' });
+  
+  return pdf.output('blob');
 };

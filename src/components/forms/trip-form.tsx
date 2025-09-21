@@ -9,9 +9,9 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FishingTrip, Expense, FishSale, HireDetails } from "@/types/fishing";
 import { calculateProfit, calculateProfitDistribution, generateTripId, generateFishSaleId } from "@/lib/calculations";
-import { generateInvoiceNumber, downloadInvoiceAsPDF, printInvoice } from "@/lib/invoice";
+import { generateInvoiceNumber, downloadInvoiceAsPDF, shareInvoiceWhatsApp } from "@/lib/invoice";
 import { BoatSettingsService } from "@/components/settings/boat-settings";
-import { Plus, Minus, Save, FileText, Printer } from "lucide-react";
+import { Plus, Minus, Save, FileText, Share } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface TripFormProps {
@@ -127,7 +127,7 @@ export function TripForm({ onSubmit, onSaveBasic, initialData, isEditing = false
     }
   };
 
-  const generateInvoice = async (fishSale: FishSale, action: 'download' | 'print') => {
+  const generateInvoice = async (fishSale: FishSale, action: 'download' | 'share') => {
     try {
       const boatSettings = await BoatSettingsService.getSettings();
       
@@ -159,10 +159,10 @@ export function TripForm({ onSubmit, onSaveBasic, initialData, isEditing = false
           description: `Invoice for ${fishSale.name} has been downloaded as PDF.`
         });
       } else {
-        printInvoice(invoiceData);
+        await shareInvoiceWhatsApp(invoiceData);
         toast({
-          title: "Invoice printed",
-          description: `Invoice for ${fishSale.name} is being printed.`
+          title: "Invoice shared",
+          description: `Invoice for ${fishSale.name} is ready to share via WhatsApp.`
         });
       }
     } catch (error) {
@@ -570,11 +570,11 @@ export function TripForm({ onSubmit, onSaveBasic, initialData, isEditing = false
                         type="button"
                         variant="outline"
                         size="sm"
-                        onClick={() => generateInvoice(sale, 'print')}
+                        onClick={() => generateInvoice(sale, 'share')}
                         className="flex-1"
                       >
-                        <Printer className="h-4 w-4 mr-1" />
-                        Print Invoice
+                        <Share className="h-4 w-4 mr-1" />
+                        Share via WhatsApp
                       </Button>
                     </div>
                   </div>
