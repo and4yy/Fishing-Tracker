@@ -4,7 +4,7 @@ const VAPID_PUBLIC_KEY = "BH7zQr1o5G2v4K3-8JE5xM9LNxQrTpWdXf2nYvH8pC6Qw7E9tR5yU3
 
 // Create a generic supabase client for untyped table access
 const genericSupabase = supabase as any;
-const urlBase64ToUint8Array = (base64String: string): Uint8Array => {
+const urlBase64ToUint8Array = (base64String: string): Uint8Array<ArrayBuffer> => {
   const padding = '='.repeat((4 - base64String.length % 4) % 4);
   const base64 = (base64String + padding)
     .replace(/-/g, '+')
@@ -16,7 +16,7 @@ const urlBase64ToUint8Array = (base64String: string): Uint8Array => {
   for (let i = 0; i < rawData.length; ++i) {
     outputArray[i] = rawData.charCodeAt(i);
   }
-  return outputArray;
+  return outputArray as Uint8Array<ArrayBuffer>;
 };
 
 export class PushNotificationService {

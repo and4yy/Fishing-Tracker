@@ -403,7 +403,7 @@ export const generateInvoicePDF = (invoiceData: InvoiceData): string => {
                 <tbody>
                     <tr>
                         <td>${fishSale.weight} kg</td>
-                        <td>${tripType} - Freshly Cached</td>
+                        <td>${tripType} - ${fishSale.fishType === 'Iced' ? 'Iced Fish' : 'Freshly Caught'}${fishSale.remarks ? ` (${fishSale.remarks})` : ''}</td>
                         <td>MVR ${fishSale.ratePrice.toFixed(2)}</td>
                         <td>MVR ${fishSale.totalAmount.toFixed(2)}</td>
                     </tr>
@@ -549,10 +549,11 @@ export const downloadInvoiceAsPDF = async (invoiceData: InvoiceData): Promise<vo
     yPos += 10;
     
     // Items table content
+    const fishDescription = `${tripType} - ${fishSale.fishType === 'Iced' ? 'Iced Fish' : 'Freshly Caught'}${fishSale.remarks ? ` (${fishSale.remarks})` : ''}`;
     pdf.setFont('helvetica', 'normal');
     pdf.setTextColor(0, 0, 0);
     pdf.text(`${fishSale.weight} kg`, margin + 5, yPos + 6);
-    pdf.text(`${tripType} - Freshly Cached`, margin + 30, yPos + 6);
+    pdf.text(fishDescription, margin + 30, yPos + 6);
     pdf.text(`MVR ${fishSale.ratePrice.toFixed(2)}`, margin + 100, yPos + 6);
     pdf.setFont('helvetica', 'bold');
     pdf.text(`MVR ${fishSale.totalAmount.toFixed(2)}`, pageWidth - margin - 30, yPos + 6, { align: 'right' });
@@ -750,9 +751,10 @@ const generatePDFBlob = async (invoiceData: InvoiceData): Promise<Blob> => {
   
   // Item details
   const yPos = 160;
+  const blobFishDescription = `${tripType} - ${fishSale.fishType === 'Iced' ? 'Iced Fish' : 'Freshly Caught'}${fishSale.remarks ? ` (${fishSale.remarks})` : ''}`;
   pdf.setFont('helvetica', 'bold');
   pdf.text(`${fishSale.weight} kg`, margin + 5, yPos + 6);
-  pdf.text(`${tripType} - Freshly Cached`, margin + 30, yPos + 6);
+  pdf.text(blobFishDescription, margin + 30, yPos + 6);
   pdf.text(`MVR ${fishSale.ratePrice.toFixed(2)}`, margin + 100, yPos + 6);
   pdf.text(`MVR ${fishSale.totalAmount.toFixed(2)}`, pageWidth - margin - 30, yPos + 6, { align: 'right' });
   
