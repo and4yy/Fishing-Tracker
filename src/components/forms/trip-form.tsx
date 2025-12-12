@@ -86,8 +86,26 @@ export function TripForm({ onSubmit, onSaveBasic, initialData, isEditing = false
     }
 
     const totalAmount = newFishSale.weight * newFishSale.ratePrice;
+    const newId = `sale-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    
+    // Check if a sale with similar data was just added (prevent double-click)
+    const recentSale = formData.fishSales.find(s => 
+      s.name === newFishSale.name.trim() && 
+      s.weight === newFishSale.weight && 
+      s.ratePrice === newFishSale.ratePrice &&
+      Date.now() - parseInt(s.id.split('-')[1]) < 1000
+    );
+    
+    if (recentSale) {
+      toast({
+        title: "Duplicate prevented",
+        description: "This sale was already added.",
+      });
+      return;
+    }
+    
     const fishSale: FishSale = {
-      id: generateFishSaleId(),
+      id: newId,
       name: newFishSale.name.trim(),
       contact: newFishSale.contact.trim(),
       weight: newFishSale.weight,
