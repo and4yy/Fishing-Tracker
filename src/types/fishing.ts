@@ -12,6 +12,8 @@ export interface FishSale {
   ratePrice: number;
   totalAmount: number;
   paid: boolean;
+  fishType?: 'Fresh' | 'Iced';
+  remarks?: string;
 }
 
 export interface HireDetails {

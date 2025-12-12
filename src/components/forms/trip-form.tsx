@@ -49,7 +49,9 @@ export function TripForm({ onSubmit, onSaveBasic, initialData, isEditing = false
     contact: '',
     weight: 0,
     ratePrice: 0,
-    paid: false
+    paid: false,
+    fishType: 'Fresh' as 'Fresh' | 'Iced',
+    remarks: ''
   });
 
   const addCrewMember = () => {
@@ -91,7 +93,9 @@ export function TripForm({ onSubmit, onSaveBasic, initialData, isEditing = false
       weight: newFishSale.weight,
       ratePrice: newFishSale.ratePrice,
       totalAmount,
-      paid: newFishSale.paid
+      paid: newFishSale.paid,
+      fishType: newFishSale.fishType,
+      remarks: newFishSale.remarks.trim()
     };
 
     setFormData(prev => ({
@@ -106,7 +110,9 @@ export function TripForm({ onSubmit, onSaveBasic, initialData, isEditing = false
       contact: '',
       weight: 0,
       ratePrice: 0,
-      paid: false
+      paid: false,
+      fishType: 'Fresh',
+      remarks: ''
     });
 
     toast({
@@ -459,7 +465,7 @@ export function TripForm({ onSubmit, onSaveBasic, initialData, isEditing = false
             <CardTitle>Fish Sale Details</CardTitle>
           </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div>
               <Label htmlFor="fishName">Customer Name</Label>
               <Input
@@ -477,6 +483,21 @@ export function TripForm({ onSubmit, onSaveBasic, initialData, isEditing = false
                 value={newFishSale.contact}
                 onChange={(e) => setNewFishSale(prev => ({ ...prev, contact: e.target.value }))}
               />
+            </div>
+            <div>
+              <Label htmlFor="fishType">Fish Type</Label>
+              <Select 
+                value={newFishSale.fishType} 
+                onValueChange={(value) => setNewFishSale(prev => ({ ...prev, fishType: value as 'Fresh' | 'Iced' }))}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Fresh">Fresh Fish</SelectItem>
+                  <SelectItem value="Iced">Iced Fish</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <div>
               <Label htmlFor="fishWeight">Weight (kg)</Label>
@@ -520,6 +541,15 @@ export function TripForm({ onSubmit, onSaveBasic, initialData, isEditing = false
               </Button>
             </div>
           </div>
+          <div>
+            <Label htmlFor="fishRemarks">Remarks</Label>
+            <Input
+              id="fishRemarks"
+              placeholder="Optional remarks for this sale"
+              value={newFishSale.remarks}
+              onChange={(e) => setNewFishSale(prev => ({ ...prev, remarks: e.target.value }))}
+            />
+          </div>
           
           {newFishSale.weight > 0 && newFishSale.ratePrice > 0 && (
             <div className="text-sm text-muted-foreground">
@@ -534,9 +564,14 @@ export function TripForm({ onSubmit, onSaveBasic, initialData, isEditing = false
                 {formData.fishSales.map((sale) => (
                   <div key={sale.id} className="p-3 bg-muted rounded-lg space-y-3">
                     <div className="flex items-center justify-between">
-                      <div className="flex-1 grid grid-cols-1 md:grid-cols-4 gap-2 text-sm">
+                      <div className="flex-1 grid grid-cols-1 md:grid-cols-5 gap-2 text-sm">
                         <div><strong>{sale.name}</strong></div>
                         <div>{sale.contact}</div>
+                        <div className="flex items-center gap-1">
+                          <span className={`px-2 py-0.5 rounded text-xs ${sale.fishType === 'Fresh' ? 'bg-blue-100 text-blue-800' : 'bg-cyan-100 text-cyan-800'}`}>
+                            {sale.fishType || 'Fresh'}
+                          </span>
+                        </div>
                         <div>{sale.weight}kg × MVR {sale.ratePrice}</div>
                         <div className="flex items-center gap-2">
                           <span className="font-medium">MVR {sale.totalAmount.toFixed(2)}</span>
@@ -555,6 +590,11 @@ export function TripForm({ onSubmit, onSaveBasic, initialData, isEditing = false
                         <Minus className="h-4 w-4" />
                       </Button>
                     </div>
+                    {sale.remarks && (
+                      <div className="text-xs text-muted-foreground mt-1">
+                        Remarks: {sale.remarks}
+                      </div>
+                    )}
                     <div className="flex gap-2">
                       <Button
                         type="button"
